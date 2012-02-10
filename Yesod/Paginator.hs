@@ -1,6 +1,7 @@
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE TypeFamilies      #-}
 -------------------------------------------------------------------------------
 -- |
 --
@@ -73,10 +74,13 @@ paginate per items = do
 --   >                  ^{widget}
 --   >             |]
 --
-selectPaginated :: (YesodPersist m, PersistEntity v,
-                    PersistQuery (YesodPersistBackend m) (GHandler s m))
+selectPaginated :: ( YesodPersistBackend m ~ PersistEntityBackend v
+                   , YesodPersist m
+                   , PersistEntity v
+                   , PersistQuery (PersistEntityBackend v) (GHandler s m)
+                   )
                 => Int -> [Filter v] -> [SelectOpt v]
-                -> GHandler s m ([Entity (YesodPersistBackend m) v], GWidget s m ())
+                -> GHandler s m ([Entity v], GWidget s m ())
 selectPaginated per filters selectOpts = do
     tot <- runDB $ count filters
     p   <- getCurrentPage tot
