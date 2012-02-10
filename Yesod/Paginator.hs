@@ -26,9 +26,9 @@ module Yesod.Paginator
     , paginationWidget
     ) where
 
-import Yesod
-import Database.Persist.Store (Entity)
-import Data.Text (Text)
+import Yesod -- TODO: minimal deps
+import Control.Monad (when)
+import Data.Text     (Text)
 import qualified Data.Text as T
 
 -- | Paginate an existing list of items.
@@ -95,45 +95,42 @@ paginationWidget :: Int -- ^ current page
                  -> Int -- ^ total number of items
                  -> GWidget s m ()
 paginationWidget page per tot = do
+    -- total / per + 1 for any remainder
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
 
-    if pages <= 1
-        then return ()
-        else do
-            let prev = [1       ..(page-1)]
-            let next = [(page+1)..pages   ]
+    when (pages > 1) $ do
+        let prev = [1       ..(page-1)]
+        let next = [(page+1)..pages   ]
 
-            let lim = 9 -- don't show more than nine links on either side
-            let prev' = if length prev > lim then drop ((length prev) - lim) prev else prev
-            let next' = if length next > lim then take lim next else next
+        let lim = 9 -- don't show more than nine links on either side
+        let prev' = if length prev > lim then drop ((length prev) - lim) prev else prev
+        let next' = if length next > lim then take lim next else next
 
-            curParams <- lift $ fmap reqGetParams getRequest
+        curParams <- lift $ fmap reqGetParams getRequest
 
-            [whamlet|
-                <ul>
-                    <li .prev :null prev:.disabled>
-                        ^{linkTo curParams (page - 1) "← Previous"}
+        [whamlet|
+            <ul>
+                ^{linkToDisabled (null prev) curParams (page - 1) "← Previous"}
 
-                    $if (/=) prev prev'
-                        <li>^{linkTo curParams 1 "1"}
-                        <li>...
+                $if (/=) prev prev'
+                    <li>^{linkTo curParams 1 "1"}
+                    <li>...
 
-                    $forall p <- prev'
-                        <li>^{linkTo curParams p (show p)}
+                $forall p <- prev'
+                    <li>^{linkTo curParams p (show p)}
 
-                    <li .active>
-                        <a href="#">#{show page}
+                <li .active>
+                    <a href="#">#{show page}
 
-                    $forall n <- next'
-                        <li>^{linkTo curParams n (show n)}
+                $forall n <- next'
+                    <li>^{linkTo curParams n (show n)}
 
-                    $if (/=) next next'
-                        <li>...
-                        <li>^{linkTo curParams tot (show tot)}
+                $if (/=) next next'
+                    <li>...
+                    <li>^{linkTo curParams tot (show tot)}
 
-                    <li .next :null next:.disabled>
-                        ^{linkTo curParams (page + 1) "Next →"}
-                |]
+                ^{linkToDisabled (null next) curParams (page + 1) "Next →"}
+            |]
 
 getCurrentPage :: Int -> GHandler s m Int
 getCurrentPage tot = do
@@ -159,3 +156,17 @@ linkTo params pg txt = do
     [whamlet|
         <a href="#{updateGetParam params param}">#{txt}
         |]
+
+-- | Similiar, but used for Previous/Next so that there's no href when
+--   disabled
+linkToDisabled :: Bool -- ^ disabled?
+               -> [(Text,Text)] -> Int -> String -> GWidget s m ()
+linkToDisabled True _ _ txt = [whamlet|
+    <li .prev .disabled>
+        <a>#{txt}
+    |]
+
+linkToDisabled _ params pg txt = [whamlet|
+    <li .prev>
+        ^{linkTo params pg txt}
+    |]
