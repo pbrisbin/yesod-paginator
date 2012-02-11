@@ -31,8 +31,7 @@ selecting only the records needed to display the current page?
 ~~~ { .haskell }
 getPageR :: Handler RepHtml
 getPageR = do
-    -- note: things is [Entity a] just like selectList returns
-    (things, widget) <- selectPaginated 10 [] []
+    (things, widget) <- runDB $ selectPaginated 10 [] []
 
     defaultLayout $ do
         [whamlet|
@@ -42,3 +41,17 @@ getPageR = do
             ^{widget}
             |]
 ~~~
+
+### Notes:
+
+`selectPaginated` can be thought of a direct drop-in for `selectList`. 
+This means it can be thrown inside any existing `runDB` block. Example 
+[here][tags]
+
+[tags]: https://github.com/pbrisbin/devsite/blob/master/Handler/Tags.hs#L17
+
+`paginationWidget` is also available if you've already got more 
+complicated database code doing the record pagination but you just want 
+the pretty links. Example [here][widget].
+
+[widget]: https://github.com/pbrisbin/renters-reality/blob/master/Helpers/Search.hs#L54
