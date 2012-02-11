@@ -28,7 +28,9 @@ module Yesod.Paginator
 
 import Yesod -- TODO: minimal deps
 import Control.Monad (when)
+import Control.Monad.Trans.Class (MonadTrans)
 import Data.Text     (Text)
+import Data.Maybe    (fromMaybe)
 import qualified Data.Text as T
 
 -- | Paginate an existing list of items.
@@ -51,11 +53,10 @@ paginate :: Int -- ^ items per page
          -> [a] -- ^ complete list of items
          -> GHandler s m ([a], GWidget s m ())
 paginate per items = do
+    p <- getCurrentPage
+
     let tot = length items
-
-    p <- getCurrentPage tot
-
-    let xs = take per $ drop ((p - 1) * per) items
+    let  xs = take per $ drop ((p - 1) * per) items
 
     return (xs, paginationWidget p per tot)
 
@@ -63,7 +64,7 @@ paginate per items = do
 --
 --   > getSomeRoute something = do
 --   >     -- note: things is [Entity val] just like selectList returns
---   >     (things, widget) <- selectPaginated 10 [SomeThing ==. something] []
+--   >     (things, widget) <- runDB $ selectPaginated 10 [SomeThing ==. something] []
 --   >
 --   >     defaultLayout $ do
 --   >         [whamlet|
@@ -74,17 +75,15 @@ paginate per items = do
 --   >                  ^{widget}
 --   >             |]
 --
-selectPaginated :: ( YesodPersistBackend m ~ PersistEntityBackend v
-                   , YesodPersist m
+selectPaginated :: ( MonadTrans (PersistEntityBackend v)
                    , PersistEntity v
-                   , PersistQuery (PersistEntityBackend v) (GHandler s m)
-                   )
-                => Int -> [Filter v] -> [SelectOpt v]
-                -> GHandler s m ([Entity v], GWidget s m ())
+                   , PersistQuery (PersistEntityBackend v) (GHandler s m))
+                => Int-> [Filter v] -> [SelectOpt v]
+                -> PersistEntityBackend v (GHandler s m) ([Entity v], GWidget s1 m1 ())
 selectPaginated per filters selectOpts = do
-    tot <- runDB $ count filters
-    p   <- getCurrentPage tot
-    xs  <- runDB $ selectList filters (selectOpts ++ [OffsetBy ((p-1)*per), LimitTo per])
+    p   <- lift getCurrentPage
+    tot <- count filters
+    xs  <- selectList filters (selectOpts ++ [OffsetBy ((p-1)*per), LimitTo per])
 
     return (xs, paginationWidget p per tot)
 
@@ -120,7 +119,7 @@ paginationWidget page per tot = do
                     <li>^{linkTo curParams p (show p)}
 
                 <li .active>
-                    <a href="#">#{show page}
+                    <a>#{show page}
 
                 $forall n <- next'
                     <li>^{linkTo curParams n (show n)}
@@ -132,17 +131,14 @@ paginationWidget page per tot = do
                 ^{linkToDisabled (null next) curParams (page + 1) "Next →"}
             |]
 
-getCurrentPage :: Int -> GHandler s m Int
-getCurrentPage tot = do
-    mp <- lookupGetParam "p"
-    return $
-        case mp of
-            Nothing -> 1
-            Just "" -> 1
-            Just p  ->
-                case readIntegral $ T.unpack p of
-                    Just i -> if i > tot then tot else i
-                    _      -> 1
+-- | looks up the \"p\" GET param and converts it to an Int. returns a
+--   default of 1 when conversion fails.
+getCurrentPage :: GHandler s m Int
+getCurrentPage = fmap (fromMaybe 1 . go) $ lookupGetParam "p"
+
+    where
+        go :: Maybe Text -> Maybe Int
+        go mp = readIntegral . T.unpack =<< mp
 
 updateGetParam :: [(Text,Text)] -> (Text,Text) -> Text
 updateGetParam getParams (p, n) = (T.cons '?') . T.intercalate "&"
