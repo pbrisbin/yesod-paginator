@@ -113,7 +113,8 @@ paginationWidget page per tot = do
 
                 $if (/=) prev prev'
                     <li>^{linkTo curParams 1 "1"}
-                    <li>...
+                    <li>
+                        <a>...
 
                 $forall p <- prev'
                     <li>^{linkTo curParams p (show p)}
@@ -125,8 +126,9 @@ paginationWidget page per tot = do
                     <li>^{linkTo curParams n (show n)}
 
                 $if (/=) next next'
-                    <li>...
-                    <li>^{linkTo curParams tot (show tot)}
+                    <li>
+                        <a>...
+                    <li>^{linkTo curParams pages (show pages)}
 
                 ^{linkToDisabled (null next) curParams (page + 1) "Next →"}
             |]
