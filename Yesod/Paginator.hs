@@ -54,9 +54,7 @@ module Yesod.Paginator
     , paginationWidget
     ) where
 
-import Yesod.Handler
-import Yesod.Widget
-import Yesod.Persist
+import Yesod
 import Yesod.Paginator.Widget
 import Control.Monad.Trans.Class (MonadTrans)
 
