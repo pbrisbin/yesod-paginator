@@ -12,6 +12,34 @@ import Data.Maybe    (fromMaybe)
 import Data.Text     (Text)
 import qualified Data.Text as T
 
+-- | Individual links to pages need to follow strict (but sane) markup
+--   to be styled correctly by bootstrap. This type allows construction
+--   of such links in both enabled and disabled states.
+data PageLink = Enabled Int String String -- ^ page, content, class
+              | Disabled    String String -- ^ content, class
+
+-- | Correctly show one of the constructed links
+showLink :: [(Text, Text)] -> PageLink -> GWidget s m ()
+showLink params (Enabled pg cnt cls) = do
+    let param = ("p", T.pack . show $ pg)
+
+    [whamlet|
+        <li .#{cls}>
+            <a href="#{updateGetParam params param}">#{cnt}
+        |]
+
+    where
+        updateGetParam :: [(Text,Text)] -> (Text,Text) -> Text
+        updateGetParam getParams (p, n) = (T.cons '?') . T.intercalate "&"
+                                        . map (\(k,v) -> k `T.append` "=" `T.append` v)
+                                        . (++ [(p, n)]) . filter ((/= p) . fst) $ getParams
+
+showLink _ (Disabled cnt cls) =
+    [whamlet|
+        <li .#{cls} .disabled>
+            <a>#{cnt}
+        |]
+
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
 paginationWidget :: Int -- ^ current page
@@ -23,40 +51,60 @@ paginationWidget page per tot = do
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
 
     when (pages > 1) $ do
-        let prev = [1       ..(page-1)]
-        let next = [(page+1)..pages   ]
-
-        let lim = 9 -- don't show more than nine links on either side
-        let prev' = if length prev > lim then drop ((length prev) - lim) prev else prev
-        let next' = if length next > lim then take lim next else next
-
         curParams <- lift $ fmap reqGetParams getRequest
 
         [whamlet|
             <ul>
-                ^{linkToDisabled (null prev) curParams (page - 1) "← Previous"}
-
-                $if (/=) prev prev'
-                    <li>^{linkTo curParams 1 "1"}
-                    <li>
-                        <a>...
-
-                $forall p <- prev'
-                    <li>^{linkTo curParams p (show p)}
-
-                <li .active>
-                    <a>#{show page}
-
-                $forall n <- next'
-                    <li>^{linkTo curParams n (show n)}
-
-                $if (/=) next next'
-                    <li>
-                        <a>...
-                    <li>^{linkTo curParams pages (show pages)}
-
-                ^{linkToDisabled (null next) curParams (page + 1) "Next →"}
+                $forall link <- buildLinks page pages
+                    ^{showLink curParams link}
             |]
+
+    where
+        -- | Build up each component of the overall list of links. We'll
+        --   use empty lists to denote ommissions along the way then
+        --   concatenate.
+        buildLinks :: Int -> Int -> [PageLink]
+        buildLinks pg pgs =
+            let prev = [1      .. pg - 1]
+                next = [pg + 1 .. pgs   ]
+
+                -- these always appear
+                prevLink = [(if null prev then Disabled else Enabled (pg - 1)) "«" "prev"]
+                nextLink = [(if null next then Disabled else Enabled (pg + 1)) "»" "next"]
+
+                -- if condition then singleton else empty
+                iff True x = [x]
+                iff _    _ = []
+
+                -- show first/last unless we're on it
+                firstLink = iff (pg > 1)   $ Enabled 1   "1"        "prev"
+                lastLink  = iff (pg < pgs) $ Enabled pgs (show pgs) "next"
+
+                lim = 9
+
+                -- we'll show ellipsis if there are enough links that some will
+                -- be ommitted from the list
+                prevEllipsis = iff (length prev > lim + 1) $ Disabled "..." "prev"
+                nextEllipsis = iff (length next > lim + 1) $ Disabled "..." "next"
+
+                -- the middle lists, strip the first/last pages and
+                -- correctly take up to limit away from current
+                prevLinks = reverse . take lim . reverse . drop 1 $ map (\p -> Enabled p (show p) "prev") prev
+                nextLinks = take lim . reverse . drop 1 . reverse $ map (\p -> Enabled p (show p) "next") next
+
+                -- finally, this page itself
+                curLink = [Disabled (show pg) "active"]
+
+            in concat [ prevLink
+                      , firstLink
+                      , prevEllipsis
+                      , prevLinks
+                      , curLink
+                      , nextLinks
+                      , nextEllipsis
+                      , lastLink
+                      , nextLink
+                      ]
 
 -- | looks up the \"p\" GET param and converts it to an Int. returns a
 --   default of 1 when conversion fails.
@@ -66,30 +114,3 @@ getCurrentPage = fmap (fromMaybe 1 . go) $ lookupGetParam "p"
     where
         go :: Maybe Text -> Maybe Int
         go mp = readIntegral . T.unpack =<< mp
-
-updateGetParam :: [(Text,Text)] -> (Text,Text) -> Text
-updateGetParam getParams (p, n) = (T.cons '?') . T.intercalate "&"
-                                . map (\(k,v) -> k `T.append` "=" `T.append` v)
-                                . (++ [(p, n)]) . filter ((/= p) . fst) $ getParams
-
-linkTo :: [(Text,Text)] -> Int -> String -> GWidget s m ()
-linkTo params pg txt = do
-    let param = ("p", T.pack $ show pg)
-
-    [whamlet|
-        <a href="#{updateGetParam params param}">#{txt}
-        |]
-
--- | Similiar, but used for Previous/Next so that there's no href when
---   disabled
-linkToDisabled :: Bool -- ^ disabled?
-               -> [(Text,Text)] -> Int -> String -> GWidget s m ()
-linkToDisabled True _ _ txt = [whamlet|
-    <li .prev .disabled>
-        <a>#{txt}
-    |]
-
-linkToDisabled _ params pg txt = [whamlet|
-    <li .prev>
-        ^{linkTo params pg txt}
-    |]
