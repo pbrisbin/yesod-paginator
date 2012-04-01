@@ -72,20 +72,16 @@ paginationWidget page per tot = do
                 prevLink = [(if null prev then Disabled else Enabled (pg - 1)) "«" "prev"]
                 nextLink = [(if null next then Disabled else Enabled (pg + 1)) "»" "next"]
 
-                -- if condition then singleton else empty
-                iff True x = [x]
-                iff _    _ = []
-
                 -- show first/last unless we're on it
-                firstLink = iff (pg > 1)   $ Enabled 1   "1"        "prev"
-                lastLink  = iff (pg < pgs) $ Enabled pgs (show pgs) "next"
+                firstLink = [ Enabled 1   "1"        "prev" | pg > 1   ]
+                lastLink  = [ Enabled pgs (show pgs) "next" | pg < pgs ]
 
                 lim = 9
 
                 -- we'll show ellipsis if there are enough links that some will
                 -- be ommitted from the list
-                prevEllipsis = iff (length prev > lim + 1) $ Disabled "..." "prev"
-                nextEllipsis = iff (length next > lim + 1) $ Disabled "..." "next"
+                prevEllipsis = [ Disabled "..." "prev" | length prev > lim + 1 ]
+                nextEllipsis = [ Disabled "..." "next" | length next > lim + 1 ]
 
                 -- the middle lists, strip the first/last pages and
                 -- correctly take up to limit away from current
