@@ -21,8 +21,10 @@ type PageWidget s m = Int -> Int -> Int -> GWidget s m ()
 data PageWidgetConfig = PageWidgetConfig {
    prevText   :: Text    -- ^ The text for the 'previous page' link.
  , nextText   :: Text    -- ^ The text for the 'next page' link.
- , pagesCount :: Int -- ^ The number of page links to show
+ , pageCount :: Int -- ^ The number of page links to show
  , ascending  :: Bool -- ^ Whether to list pages in ascending order.
+ , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
+                          -- more pages than pageCount
 }
 
 -- | Individual links to pages need to follow strict (but sane) markup
@@ -57,8 +59,10 @@ showLink _ (Disabled cnt cls) =
 defaultWidget :: PageWidget s m
 defaultWidget = paginationWidget $ PageWidgetConfig { prevText = "«"
                                                     , nextText = "»"
-                                                    , pagesCount = 9
-                                                    , ascending = True}
+                                                    , pageCount = 9
+                                                    , ascending = True
+                                                    , showEllipsis = True
+                                                    }
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
@@ -95,13 +99,13 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 
                 -- we'll show ellipsis if there are enough links that some will
                 -- be ommitted from the list
-                prevEllipsis = [ Disabled "..." "prev" | length prev > pagesCount + 1 ]
-                nextEllipsis = [ Disabled "..." "next" | length next > pagesCount + 1 ]
+                prevEllipsis = [ Disabled "..." "prev" | showEllipsis && length prev > pageCount + 1 ]
+                nextEllipsis = [ Disabled "..." "next" | showEllipsis && length next > pageCount + 1 ]
 
                 -- the middle lists, strip the first/last pages and
                 -- correctly take up to limit away from current
-                prevLinks = reverse . take pagesCount . reverse . drop 1 $ map (\p -> Enabled p (showT p) "prev") prev
-                nextLinks = take pagesCount . reverse . drop 1 . reverse $ map (\p -> Enabled p (showT p) "next") next
+                prevLinks = reverse . take pageCount . reverse . drop 1 $ map (\p -> Enabled p (showT p) "prev") prev
+                nextLinks = take pageCount . reverse . drop 1 . reverse $ map (\p -> Enabled p (showT p) "next") next
 
                 -- finally, this page itself
                 curLink = [Disabled (showT pg) "active"]
