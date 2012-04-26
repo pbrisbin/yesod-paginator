@@ -1,27 +1,43 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Yesod.Paginator.Widget
- ( getCurrentPage  
+ ( getCurrentPage
  , paginationWidget
+ , defaultWidget
+ , PageWidget
+ , PageWidgetConfig(..)
  ) where
 
-import Yesod
+import           Yesod
 
-import Control.Monad (when)
-import Data.Maybe    (fromMaybe)
-import Data.Text     (Text)
+import           Control.Monad (when)
+import           Data.Maybe    (fromMaybe)
+import           Data.Text (Text)
 import qualified Data.Text as T
+
+type PageWidget s m = Int -> Int -> Int -> GWidget s m ()
+
+data PageWidgetConfig = PageWidgetConfig {
+   prevText   :: Text    -- ^ The text for the 'previous page' link.
+ , nextText   :: Text    -- ^ The text for the 'next page' link.
+ , pageCount :: Int -- ^ The number of page links to show
+ , ascending  :: Bool -- ^ Whether to list pages in ascending order.
+ , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
+                          -- more pages than pageCount
+}
 
 -- | Individual links to pages need to follow strict (but sane) markup
 --   to be styled correctly by bootstrap. This type allows construction
 --   of such links in both enabled and disabled states.
-data PageLink = Enabled Int String String -- ^ page, content, class
-              | Disabled    String String -- ^ content, class
+data PageLink = Enabled Int Text Text -- ^ page, content, class
+              | Disabled    Text Text -- ^ content, class
+
 
 -- | Correctly show one of the constructed links
 showLink :: [(Text, Text)] -> PageLink -> GWidget s m ()
 showLink params (Enabled pg cnt cls) = do
-    let param = ("p", T.pack . show $ pg)
+    let param = ("p", showT pg)
 
     [whamlet|
         <li .#{cls}>
@@ -40,13 +56,18 @@ showLink _ (Disabled cnt cls) =
             <a>#{cnt}
         |]
 
+defaultWidget :: PageWidget s m
+defaultWidget = paginationWidget $ PageWidgetConfig { prevText = "«"
+                                                    , nextText = "»"
+                                                    , pageCount = 9
+                                                    , ascending = True
+                                                    , showEllipsis = True
+                                                    }
+
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
-paginationWidget :: Int -- ^ current page
-                 -> Int -- ^ items per page
-                 -> Int -- ^ total number of items
-                 -> GWidget s m ()
-paginationWidget page per tot = do
+paginationWidget :: PageWidgetConfig -> PageWidget s m
+paginationWidget (PageWidgetConfig {..}) page per tot = do
     -- total / per + 1 for any remainder
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
 
@@ -69,29 +90,27 @@ paginationWidget page per tot = do
                 next = [pg + 1 .. pgs   ]
 
                 -- these always appear
-                prevLink = [(if null prev then Disabled else Enabled (pg - 1)) "«" "prev"]
-                nextLink = [(if null next then Disabled else Enabled (pg + 1)) "»" "next"]
+                prevLink = [(if null prev then Disabled else Enabled (pg - 1)) prevText "prev"]
+                nextLink = [(if null next then Disabled else Enabled (pg + 1)) nextText "next"]
 
                 -- show first/last unless we're on it
                 firstLink = [ Enabled 1   "1"        "prev" | pg > 1   ]
-                lastLink  = [ Enabled pgs (show pgs) "next" | pg < pgs ]
-
-                lim = 9
+                lastLink  = [ Enabled pgs (showT pgs) "next" | pg < pgs ]
 
                 -- we'll show ellipsis if there are enough links that some will
                 -- be ommitted from the list
-                prevEllipsis = [ Disabled "..." "prev" | length prev > lim + 1 ]
-                nextEllipsis = [ Disabled "..." "next" | length next > lim + 1 ]
+                prevEllipsis = [ Disabled "..." "prev" | showEllipsis && length prev > pageCount + 1 ]
+                nextEllipsis = [ Disabled "..." "next" | showEllipsis && length next > pageCount + 1 ]
 
                 -- the middle lists, strip the first/last pages and
                 -- correctly take up to limit away from current
-                prevLinks = reverse . take lim . reverse . drop 1 $ map (\p -> Enabled p (show p) "prev") prev
-                nextLinks = take lim . reverse . drop 1 . reverse $ map (\p -> Enabled p (show p) "next") next
+                prevLinks = reverse . take pageCount . reverse . drop 1 $ map (\p -> Enabled p (showT p) "prev") prev
+                nextLinks = take pageCount . reverse . drop 1 . reverse $ map (\p -> Enabled p (showT p) "next") next
 
                 -- finally, this page itself
-                curLink = [Disabled (show pg) "active"]
+                curLink = [Disabled (showT pg) "active"]
 
-            in concat [ prevLink
+            in concat $ (if ascending then id else reverse) [ prevLink
                       , firstLink
                       , prevEllipsis
                       , prevLinks
@@ -110,3 +129,6 @@ getCurrentPage = fmap (fromMaybe 1 . go) $ lookupGetParam "p"
     where
         go :: Maybe Text -> Maybe Int
         go mp = readIntegral . T.unpack =<< mp
+
+showT :: (Show a) => a -> Text
+showT = T.pack . show
