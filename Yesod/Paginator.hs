@@ -72,22 +72,25 @@ paginateWith widget per items = do
 
     return (xs, widget p per tot)
 
-selectPaginated :: (PersistEntity val,
-                    PersistQuery (PersistEntityBackend val) (GHandler s m),
-                    MonadTrans (PersistEntityBackend val)) =>
-                   Int
-                   -> [Filter val]
-                   -> [SelectOpt val]
-                   -> PersistEntityBackend val (GHandler s m) ([Entity val], GWidget s m ())
+selectPaginated :: ( PersistEntity val
+                   , PersistQuery (PersistEntityBackend val) (GHandler s m)
+                   , MonadTrans (PersistEntityBackend val)
+                   )
+                => Int
+                -> [Filter val]
+                -> [SelectOpt val]
+                -> PersistEntityBackend val (GHandler s m) ([Entity val], GWidget s m ())
 selectPaginated = selectPaginatedWith defaultWidget
-selectPaginatedWith :: (PersistEntity val,
-                    PersistQuery (PersistEntityBackend val) (GHandler s m),
-                    MonadTrans (PersistEntityBackend val)) =>
-       PageWidget s m
-       -> Int
-       -> [Filter val]
-       -> [SelectOpt val]
-       -> PersistEntityBackend val (GHandler s m) ([Entity val], GWidget s m ())
+
+selectPaginatedWith :: ( PersistEntity val
+                       , PersistQuery (PersistEntityBackend val) (GHandler s m)
+                       , MonadTrans (PersistEntityBackend val)
+                       )
+                    => PageWidget s m
+                    -> Int
+                    -> [Filter val]
+                    -> [SelectOpt val]
+                    -> PersistEntityBackend val (GHandler s m) ([Entity val], GWidget s m ())
 selectPaginatedWith widget per filters selectOpts = do
     p   <- lift getCurrentPage
     tot <- count filters

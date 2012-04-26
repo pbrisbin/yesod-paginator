@@ -9,30 +9,28 @@ module Yesod.Paginator.Widget
  , PageWidgetConfig(..)
  ) where
 
-import           Yesod
+import Yesod
+import Control.Monad (when)
+import Data.Maybe    (fromMaybe)
+import Data.Text (Text)
 
-import           Control.Monad (when)
-import           Data.Maybe    (fromMaybe)
-import           Data.Text (Text)
 import qualified Data.Text as T
 
 type PageWidget s m = Int -> Int -> Int -> GWidget s m ()
 
-data PageWidgetConfig = PageWidgetConfig {
-   prevText   :: Text    -- ^ The text for the 'previous page' link.
- , nextText   :: Text    -- ^ The text for the 'next page' link.
- , pageCount :: Int -- ^ The number of page links to show
- , ascending  :: Bool -- ^ Whether to list pages in ascending order.
- , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
-                          -- more pages than pageCount
-}
+data PageWidgetConfig = PageWidgetConfig
+    { prevText     :: Text -- ^ The text for the 'previous page' link.
+    , nextText     :: Text -- ^ The text for the 'next page' link.
+    , pageCount    :: Int  -- ^ The number of page links to show
+    , ascending    :: Bool -- ^ Whether to list pages in ascending order.
+    , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
+    }                      --   more pages than pageCount
 
 -- | Individual links to pages need to follow strict (but sane) markup
 --   to be styled correctly by bootstrap. This type allows construction
 --   of such links in both enabled and disabled states.
 data PageLink = Enabled Int Text Text -- ^ page, content, class
               | Disabled    Text Text -- ^ content, class
-
 
 -- | Correctly show one of the constructed links
 showLink :: [(Text, Text)] -> PageLink -> GWidget s m ()
@@ -57,10 +55,10 @@ showLink _ (Disabled cnt cls) =
         |]
 
 defaultWidget :: PageWidget s m
-defaultWidget = paginationWidget $ PageWidgetConfig { prevText = "«"
-                                                    , nextText = "»"
-                                                    , pageCount = 9
-                                                    , ascending = True
+defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
+                                                    , nextText     = "»"
+                                                    , pageCount    = 9
+                                                    , ascending    = True
                                                     , showEllipsis = True
                                                     }
 
