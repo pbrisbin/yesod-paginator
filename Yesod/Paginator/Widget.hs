@@ -37,7 +37,7 @@ showLink :: [(Text, Text)] -> PageLink -> GWidget s m ()
 showLink params (Enabled pg cnt cls) = do
     let param = ("p", showT pg)
 
-    [whamlet|
+    [whamlet|$newline never
         <li .#{cls}>
             <a href="#{updateGetParam params param}">#{cnt}
         |]
@@ -49,7 +49,7 @@ showLink params (Enabled pg cnt cls) = do
                                         . (++ [(p, n)]) . filter ((/= p) . fst) $ getParams
 
 showLink _ (Disabled cnt cls) =
-    [whamlet|
+    [whamlet|$newline never
         <li .#{cls} .disabled>
             <a>#{cnt}
         |]
@@ -72,7 +72,7 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
     when (pages > 1) $ do
         curParams <- lift $ fmap reqGetParams getRequest
 
-        [whamlet|
+        [whamlet|$newline never
             <ul>
                 $forall link <- buildLinks page pages
                     ^{showLink curParams link}
