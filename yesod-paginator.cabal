@@ -17,7 +17,7 @@ library
 
   build-depends: base       >= 4    && < 5
                , text       >= 0.11 && < 0.12
-               , yesod      >= 0.10 && < 1.2
+               , yesod      >= 1.1 && < 1.2
                , persistent >= 0.8  && < 1.1
                , transformers
 
