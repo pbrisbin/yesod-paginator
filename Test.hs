@@ -3,46 +3,54 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-module Minimal where
+module App where
 
 import Yesod
 import Yesod.Paginator
 import Network.Wai.Handler.Warp (run)
 
-data Minimal = Minimal
+data App = App
 
-mkYesod "Minimal" [parseRoutes|
+mkYesod "App" [parseRoutes|
     / RootR GET
 |]
 
-instance Yesod Minimal where 
+instance Yesod App where 
     approot = ApprootRelative
     defaultLayout widget = do
         pc <- widgetToPageContent widget
-        hamletToRepHtml [hamlet|
-            \<!DOCTYPE html>
+        hamletToRepHtml [hamlet|$newline never
+            $doctype 5
             <html lang="en">
                 <head>
                     <meta charset="utf-8">
                     <title>#{pageTitle pc}
+                    <!-- steal boostrap -->
                     <link rel="stylesheet" href="http://pbrisbin.com/static/css/bootstrap.min.css">
                     ^{pageHead pc}
                 <body>
                     ^{pageBody pc}
             |]
 
--- Note this just tests the markup that the widget produces. The actual
--- pagination math is less error-prone -- though I should add tests for
--- it eventually...
 getRootR :: Handler RepHtml
-getRootR = defaultLayout $ do
-    setTitle "My title"
+getRootR = do
+    -- unneeded return here to match README
+    things' <- return [1..1142]
+
+    (things, widget) <- paginate 3 things'
     
-    [whamlet|
-        <div .pagination>
-            <!--               current page, items per page, total number of items -->
-            ^{paginationWidget 12            10              111}
-        |]
+    defaultLayout $ do
+        setTitle "My title"
+        [whamlet|$newline never
+            <h1>Pagination
+            <p>The things:
+            <ul>
+                $forall thing <- things
+                    <li>Thing #{show thing}
+
+            <div .pagination>
+                ^{widget}
+            |]
 
 main :: IO ()
-main = run 3000 =<< toWaiApp Minimal
+main = run 3000 =<< toWaiApp App
