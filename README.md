@@ -55,3 +55,11 @@ complicated database code doing the record pagination but you just want
 the pretty links. Example [here][widget].
 
 [widget]: https://github.com/pbrisbin/renters-reality/blob/master/Helpers/Search.hs#L54
+
+### Testing
+
+~~~
+$ cabal install
+$ runhaskell Test.hs
+$ $BROWSER http://localhost:3000
+~~~
