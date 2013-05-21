@@ -56,7 +56,7 @@ showLink _ (Disabled cnt cls) =
             <a>#{cnt}
         |]
 
-defaultWidget :: (MonadThrow m, MonadBaseControl IO m, MonadHandler m) => PageWidget s m
+defaultWidget :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => PageWidget s m
 defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
                                                     , nextText     = "»"
                                                     , pageCount    = 9
@@ -66,13 +66,13 @@ defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
-paginationWidget :: (MonadHandler m, MonadThrow m, MonadBaseControl IO m) => PageWidgetConfig -> PageWidget s m
+paginationWidget :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => PageWidgetConfig -> Int -> Int -> Int -> WidgetT site m ()
 paginationWidget (PageWidgetConfig {..}) page per tot = do
     -- total / per + 1 for any remainder
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
 
     when (pages > 1) $ do
-        curParams <- lift $ liftM reqGetParams getRequest
+        curParams <- handlerToWidget $ liftM reqGetParams getRequest
 
         [whamlet|$newline never
             <ul>
@@ -123,7 +123,7 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 
 -- | looks up the \"p\" GET param and converts it to an Int. returns a
 --   default of 1 when conversion fails.
-getCurrentPage :: (MonadIO m, MonadThrow m, MonadUnsafeIO m, MonadBaseControl IO m) => HandlerT s m Int
+getCurrentPage :: (MonadThrow m, MonadIO m, MonadUnsafeIO m, MonadBaseControl IO m) => HandlerT s m Int
 getCurrentPage = liftM (fromMaybe 1 . go) $ lookupGetParam "p"
 
     where

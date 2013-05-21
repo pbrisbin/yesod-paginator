@@ -60,10 +60,10 @@ import Control.Monad.Trans.Resource
 import Yesod
 import Yesod.Paginator.Widget
 
-paginate :: (MonadThrow m, MonadBaseControl IO m, MonadUnsafeIO m, MonadHandler m) => Int -> [a] -> HandlerT s m ([a], WidgetT s m ())
+paginate :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => Int -> [a] -> HandlerT s m ([a], WidgetT s m ())
 paginate = paginateWith defaultWidget
 
-paginateWith :: (MonadThrow m, MonadIO m, MonadUnsafeIO m, MonadBaseControl IO m) => PageWidget s m -> Int -> [a] -> HandlerT s m ([a], WidgetT s m ())
+paginateWith :: (MonadIO m, MonadBaseControl IO m, MonadUnsafeIO m,MonadThrow m) => (Int -> Int -> Int -> t) -> Int -> [a] -> HandlerT s m ([a], t)
 paginateWith widget per items = do
     p <- getCurrentPage
 
