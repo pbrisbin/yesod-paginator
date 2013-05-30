@@ -12,13 +12,12 @@ module Yesod.Paginator.Widget
 
 import Yesod
 import Control.Monad (when, liftM)
-import Control.Monad.Trans.Resource
 import Data.Maybe    (fromMaybe)
 import Data.Text (Text)
 
 import qualified Data.Text as T
 
-type PageWidget s m = Int -> Int -> Int -> WidgetT s m ()
+type PageWidget m = Int -> Int -> Int -> WidgetT m IO ()
 
 data PageWidgetConfig = PageWidgetConfig
     { prevText     :: Text -- ^ The text for the 'previous page' link.
@@ -35,7 +34,7 @@ data PageLink = Enabled Int Text Text -- ^ page, content, class
               | Disabled    Text Text -- ^ content, class
 
 -- | Correctly show one of the constructed links
-showLink :: (MonadIO m, MonadThrow m, MonadUnsafeIO m, MonadBaseControl IO m) => [(Text, Text)] -> PageLink -> WidgetT s m ()
+showLink :: [(Text, Text)] -> PageLink -> WidgetT m IO ()
 showLink params (Enabled pg cnt cls) = do
     let param = ("p", showT pg)
 
@@ -56,7 +55,7 @@ showLink _ (Disabled cnt cls) =
             <a>#{cnt}
         |]
 
-defaultWidget :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => PageWidget s m
+defaultWidget :: Yesod m => PageWidget m
 defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
                                                     , nextText     = "»"
                                                     , pageCount    = 9
@@ -66,7 +65,7 @@ defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
-paginationWidget :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => PageWidgetConfig -> Int -> Int -> Int -> WidgetT site m ()
+paginationWidget :: Yesod m => PageWidgetConfig -> Int -> Int -> Int -> WidgetT m IO ()
 paginationWidget (PageWidgetConfig {..}) page per tot = do
     -- total / per + 1 for any remainder
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
@@ -123,7 +122,7 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 
 -- | looks up the \"p\" GET param and converts it to an Int. returns a
 --   default of 1 when conversion fails.
-getCurrentPage :: (MonadThrow m, MonadIO m, MonadUnsafeIO m, MonadBaseControl IO m) => HandlerT s m Int
+getCurrentPage :: Yesod m => HandlerT m IO Int
 getCurrentPage = liftM (fromMaybe 1 . go) $ lookupGetParam "p"
 
     where
