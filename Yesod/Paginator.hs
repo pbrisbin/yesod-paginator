@@ -56,13 +56,14 @@ module Yesod.Paginator
     , module Yesod.Paginator.Widget
     ) where
 
+import Control.Monad.Trans.Resource
 import Yesod
 import Yesod.Paginator.Widget
 
-paginate :: Int -> [a] -> GHandler s m ([a], GWidget s m ())
+paginate :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => Int -> [a] -> HandlerT s m ([a], WidgetT s m ())
 paginate = paginateWith defaultWidget
 
-paginateWith :: PageWidget s m -> Int -> [a] -> GHandler s m ([a], GWidget s m ())
+paginateWith :: (MonadIO m, MonadBaseControl IO m, MonadUnsafeIO m,MonadThrow m) => (Int -> Int -> Int -> t) -> Int -> [a] -> HandlerT s m ([a], t)
 paginateWith widget per items = do
     p <- getCurrentPage
 
@@ -72,28 +73,33 @@ paginateWith widget per items = do
     return (xs, widget p per tot)
 
 selectPaginated :: ( PersistEntity val
-                   , PersistQuery m1
-                   , PersistEntityBackend val ~ PersistMonadBackend m1
-                   , MonadLift (GHandler s m) m1
+                   , PersistQuery (HandlerT s m)
+                   , PersistEntityBackend val ~ PersistMonadBackend (HandlerT s m)
+                   , MonadThrow m
+                   , MonadBaseControl IO m
+                   , MonadHandler m
                    )
                 => Int
                 -> [Filter val]
                 -> [SelectOpt val]
-                -> m1 ([Entity val], GWidget s m ())
+                -> HandlerT s m ([Entity val], WidgetT s m ())
 selectPaginated = selectPaginatedWith defaultWidget
 
 selectPaginatedWith :: ( PersistEntity val
-                       , PersistQuery m1
-                       , PersistEntityBackend val ~ PersistMonadBackend m1
-                       , MonadLift (GHandler s m) m1
+                       , PersistQuery (HandlerT s m)
+                       , PersistEntityBackend val ~ PersistMonadBackend (HandlerT s m)
+                       , MonadThrow m
+                       , MonadUnsafeIO m
+                       , MonadBaseControl IO m
+                       , MonadHandler m
                        )
                     => PageWidget s m
                     -> Int
                     -> [Filter val]
                     -> [SelectOpt val]
-                    -> m1 ([Entity val], GWidget s m ())
+                    -> HandlerT s m ([Entity val], WidgetT s m ())
 selectPaginatedWith widget per filters selectOpts = do
-    p   <- lift getCurrentPage
+    p   <- getCurrentPage
     tot <- count filters
     xs  <- selectList filters (selectOpts ++ [OffsetBy ((p-1)*per), LimitTo per])
 

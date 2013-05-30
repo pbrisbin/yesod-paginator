@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Yesod.Paginator.Widget
  ( getCurrentPage
  , paginationWidget
@@ -10,13 +11,14 @@ module Yesod.Paginator.Widget
  ) where
 
 import Yesod
-import Control.Monad (when)
+import Control.Monad (when, liftM)
+import Control.Monad.Trans.Resource
 import Data.Maybe    (fromMaybe)
 import Data.Text (Text)
 
 import qualified Data.Text as T
 
-type PageWidget s m = Int -> Int -> Int -> GWidget s m ()
+type PageWidget s m = Int -> Int -> Int -> WidgetT s m ()
 
 data PageWidgetConfig = PageWidgetConfig
     { prevText     :: Text -- ^ The text for the 'previous page' link.
@@ -33,7 +35,7 @@ data PageLink = Enabled Int Text Text -- ^ page, content, class
               | Disabled    Text Text -- ^ content, class
 
 -- | Correctly show one of the constructed links
-showLink :: [(Text, Text)] -> PageLink -> GWidget s m ()
+showLink :: (MonadIO m, MonadThrow m, MonadUnsafeIO m, MonadBaseControl IO m) => [(Text, Text)] -> PageLink -> WidgetT s m ()
 showLink params (Enabled pg cnt cls) = do
     let param = ("p", showT pg)
 
@@ -54,7 +56,7 @@ showLink _ (Disabled cnt cls) =
             <a>#{cnt}
         |]
 
-defaultWidget :: PageWidget s m
+defaultWidget :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => PageWidget s m
 defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
                                                     , nextText     = "»"
                                                     , pageCount    = 9
@@ -64,13 +66,13 @@ defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
-paginationWidget :: PageWidgetConfig -> PageWidget s m
+paginationWidget :: (MonadIO m, MonadUnsafeIO m, MonadThrow m, MonadBaseControl IO m) => PageWidgetConfig -> Int -> Int -> Int -> WidgetT site m ()
 paginationWidget (PageWidgetConfig {..}) page per tot = do
     -- total / per + 1 for any remainder
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
 
     when (pages > 1) $ do
-        curParams <- lift $ fmap reqGetParams getRequest
+        curParams <- handlerToWidget $ liftM reqGetParams getRequest
 
         [whamlet|$newline never
             <ul>
@@ -121,8 +123,8 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 
 -- | looks up the \"p\" GET param and converts it to an Int. returns a
 --   default of 1 when conversion fails.
-getCurrentPage :: GHandler s m Int
-getCurrentPage = fmap (fromMaybe 1 . go) $ lookupGetParam "p"
+getCurrentPage :: (MonadThrow m, MonadIO m, MonadUnsafeIO m, MonadBaseControl IO m) => HandlerT s m Int
+getCurrentPage = liftM (fromMaybe 1 . go) $ lookupGetParam "p"
 
     where
         go :: Maybe Text -> Maybe Int
