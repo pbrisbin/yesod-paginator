@@ -6,6 +6,7 @@ module Yesod.Paginator.Widget
  ( getCurrentPage
  , paginationWidget
  , defaultWidget
+ , defaultPageWidgetConfig
  , PageWidget
  , PageWidgetConfig(..)
  ) where
@@ -57,14 +58,18 @@ showLink _ (Disabled cnt cls) =
             <a>#{cnt}
         |]
 
+-- | Default widget config provided for easy overriding of only some fields.
+defaultPageWidgetConfig :: PageWidgetConfig
+defaultPageWidgetConfig = PageWidgetConfig { prevText     = "«"
+                                           , nextText     = "»"
+                                           , pageCount    = 9
+                                           , ascending    = True
+                                           , showEllipsis = True
+                                           , listClasses  = []
+                                           }
+
 defaultWidget :: Yesod m => PageWidget m
-defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
-                                                    , nextText     = "»"
-                                                    , pageCount    = 9
-                                                    , ascending    = True
-                                                    , showEllipsis = True
-                                                    , listClasses  = []
-                                                    }
+defaultWidget = paginationWidget defaultPageWidgetConfig
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
