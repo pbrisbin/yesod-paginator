@@ -25,7 +25,9 @@ data PageWidgetConfig = PageWidgetConfig
     , pageCount    :: Int  -- ^ The number of page links to show
     , ascending    :: Bool -- ^ Whether to list pages in ascending order.
     , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
-    }                      --   more pages than pageCount
+                           --   more pages than pageCount
+    , listClasses  :: [Text] -- ^ Additional classes for top level list
+    }
 
 -- | Individual links to pages need to follow strict (but sane) markup
 --   to be styled correctly by bootstrap. This type allows construction
@@ -61,6 +63,7 @@ defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
                                                     , pageCount    = 9
                                                     , ascending    = True
                                                     , showEllipsis = True
+                                                    , listClasses  = []
                                                     }
 
 -- | A widget showing pagination links. Follows bootstrap principles.
@@ -74,12 +77,15 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
         curParams <- handlerToWidget $ liftM reqGetParams getRequest
 
         [whamlet|$newline never
-            <ul>
+            <ul class="#{cls}">
                 $forall link <- buildLinks page pages
                     ^{showLink curParams link}
             |]
 
     where
+        -- | Concatenate all additional classes.
+        cls = T.intercalate " " listClasses
+
         -- | Build up each component of the overall list of links. We'll
         --   use empty lists to denote ommissions along the way then
         --   concatenate.
