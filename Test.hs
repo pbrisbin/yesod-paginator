@@ -19,7 +19,7 @@ instance Yesod App where
     approot = ApprootRelative
     defaultLayout widget = do
         pc <- widgetToPageContent widget
-        hamletToRepHtml [hamlet|$newline never
+        giveUrlRenderer [hamlet|$newline never
             $doctype 5
             <html lang="en">
                 <head>
@@ -32,7 +32,7 @@ instance Yesod App where
                     ^{pageBody pc}
             |]
 
-getRootR :: Handler RepHtml
+getRootR :: Handler Html
 getRootR = do
     -- unneeded return here to match README
     things' <- return [1..1142]
