@@ -20,12 +20,12 @@ import qualified Data.Text as T
 type PageWidget m = Int -> Int -> Int -> WidgetT m IO ()
 
 data PageWidgetConfig = PageWidgetConfig
-    { prevText     :: Text -- ^ The text for the 'previous page' link.
-    , nextText     :: Text -- ^ The text for the 'next page' link.
-    , pageCount    :: Int  -- ^ The number of page links to show
-    , ascending    :: Bool -- ^ Whether to list pages in ascending order.
-    , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
-                           --   more pages than pageCount
+    { prevText     :: Text   -- ^ The text for the 'previous page' link.
+    , nextText     :: Text   -- ^ The text for the 'next page' link.
+    , pageCount    :: Int    -- ^ The number of page links to show
+    , ascending    :: Bool   -- ^ Whether to list pages in ascending order.
+    , showEllipsis :: Bool   -- ^ Whether to show an ellipsis if there are
+                             --   more pages than pageCount
     , listClasses  :: [Text] -- ^ Additional classes for top level list
     }
 
