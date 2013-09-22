@@ -65,7 +65,7 @@ defaultPageWidgetConfig = PageWidgetConfig { prevText     = "«"
                                            , pageCount    = 9
                                            , ascending    = True
                                            , showEllipsis = True
-                                           , listClasses  = []
+                                           , listClasses  = ["pagination"]
                                            }
 
 defaultWidget :: Yesod m => PageWidget m
