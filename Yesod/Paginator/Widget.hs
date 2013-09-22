@@ -18,6 +18,7 @@ import Data.Text (Text)
 
 import qualified Data.Text as T
 
+-- | currentPage, itemsPerPage, totalItems -> widget
 type PageWidget m = Int -> Int -> Int -> WidgetT m IO ()
 
 data PageWidgetConfig = PageWidgetConfig
@@ -73,7 +74,7 @@ defaultWidget = paginationWidget defaultPageWidgetConfig
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
-paginationWidget :: Yesod m => PageWidgetConfig -> Int -> Int -> Int -> WidgetT m IO ()
+paginationWidget :: Yesod m => PageWidgetConfig -> PageWidget m
 paginationWidget (PageWidgetConfig {..}) page per tot = do
     -- total / per + 1 for any remainder
     let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per

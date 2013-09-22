@@ -62,7 +62,11 @@ import Yesod.Paginator.Widget
 paginate :: Yesod m => Int -> [a] -> HandlerT m IO ([a], WidgetT m IO ())
 paginate = paginateWith defaultWidget
 
-paginateWith :: Yesod m => (Int -> Int -> Int -> t) -> Int -> [a] -> HandlerT m IO ([a], t)
+paginateWith :: Yesod m
+             => PageWidget m
+             -> Int
+             -> [a]
+             -> HandlerT m IO ([a], WidgetT m IO ())
 paginateWith widget per items = do
     p <- getCurrentPage
 
