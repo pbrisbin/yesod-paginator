@@ -1,35 +1,16 @@
 # Yesod paginator
 
-~~~ { .haskell }
-import Yesod.Paginator
-~~~
+Handle a database query and/or array-math to paginate a list and produce 
+a pagination widget suitable for [Bootstrap][].
 
-Do you have some `[Thing]` that you've already selected out of your DB, 
-maybe composed from multiple tables, and you just want to paginate this 
-big list?
+[bootstrap]: http://getbootstrap.com/components/#pagination
 
-~~~ { .haskell }
-getPageR :: Handler RepHtml
-getPageR = do
-    things' <- getAllThings
+## Usage
 
-    -- note: things will be the same type as things'
-    (things, widget) <- paginate 10 things'
+Paginate directly out of the database:
 
-    defaultLayout $ do
-        [whamlet|
-            $forall thing <- things
-                ^{showThing thing}
-
-            ^{widget}
-            |]
-~~~
-
-Do you have a single table of records and you want to paginate them, 
-selecting only the records needed to display the current page?
-
-~~~ { .haskell }
-getPageR :: Handler RepHtml
+```haskell
+getPageR :: Handler Html
 getPageR = do
     (things, widget) <- runDB $ selectPaginated 10 [] []
 
@@ -40,26 +21,74 @@ getPageR = do
 
             ^{widget}
             |]
-~~~
+```
 
-### Notes:
+Or an existing list in memory:
 
-`selectPaginated` can be thought of a direct drop-in for `selectList`. 
-This means it can be thrown inside any existing `runDB` block. Example 
-[here][tags]
+```haskell
+getPageR :: Handler Html
+getPageR = do
+    things' <- getAllThings
 
-[tags]: https://github.com/pbrisbin/devsite/blob/master/Handler/Tags.hs#L17
+    (things, widget) <- paginate 10 things'
 
-`paginationWidget` is also available if you've already got more 
-complicated database code doing the record pagination but you just want 
-the pretty links. Example [here][widget].
+    defaultLayout $ do
+        [whamlet|
+            $forall thing <- things
+                ^{showThing thing}
 
-[widget]: https://github.com/pbrisbin/renters-reality/blob/master/Helpers/Search.hs#L54
+            ^{widget}
+            |]
+```
 
-### Testing
+Just provide the pagination widget:
 
-~~~
+```haskell
+getPageR :: Handler Html
+getPageR = do
+    cur <- getCurrentPage
+
+    let limit = 10
+
+    (items, total) <- runSphinxSearch "query" limit
+
+    defaultLayout $ do
+        [whamlet|
+          $forall thing <- things
+              ^{showThing thing}
+
+          ^{defaultWidget cur limit total}
+          |]
+```
+
+## Customization
+
+```haskell
+getPageR :: Handler Html
+getPageR = do
+    (things, widget) <- selectPaginatedWith myWidget 10 [] []
+
+    defaultLayout $ do
+        -- ...
+
+    where
+        myWidget :: PageWidget App
+        myWidget = paginationWidget $ PageWidgetConfig
+            { prevText     = "Newer"
+            , nextText     = "Older"
+            , pageCount    = 7
+            , ascending    = False
+            , showEllipsis = False
+            , listClasses  = ["pagination", "pagination-centered"]
+            }
+```
+
+## Testing
+
+```
+$ cabal install warp
 $ cabal install
-$ runhaskell Test.hs
+$ runhaskell ./Test.hs
 $ $BROWSER http://localhost:3000
-~~~
+```
+
