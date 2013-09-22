@@ -6,6 +6,7 @@ module Yesod.Paginator.Widget
  ( getCurrentPage
  , paginationWidget
  , defaultWidget
+ , defaultPageWidgetConfig
  , PageWidget
  , PageWidgetConfig(..)
  ) where
@@ -20,12 +21,14 @@ import qualified Data.Text as T
 type PageWidget m = Int -> Int -> Int -> WidgetT m IO ()
 
 data PageWidgetConfig = PageWidgetConfig
-    { prevText     :: Text -- ^ The text for the 'previous page' link.
-    , nextText     :: Text -- ^ The text for the 'next page' link.
-    , pageCount    :: Int  -- ^ The number of page links to show
-    , ascending    :: Bool -- ^ Whether to list pages in ascending order.
-    , showEllipsis :: Bool -- ^ Whether to show an ellipsis if there are
-    }                      --   more pages than pageCount
+    { prevText     :: Text   -- ^ The text for the 'previous page' link.
+    , nextText     :: Text   -- ^ The text for the 'next page' link.
+    , pageCount    :: Int    -- ^ The number of page links to show
+    , ascending    :: Bool   -- ^ Whether to list pages in ascending order.
+    , showEllipsis :: Bool   -- ^ Whether to show an ellipsis if there are
+                             --   more pages than pageCount
+    , listClasses  :: [Text] -- ^ Additional classes for top level list
+    }
 
 -- | Individual links to pages need to follow strict (but sane) markup
 --   to be styled correctly by bootstrap. This type allows construction
@@ -55,13 +58,18 @@ showLink _ (Disabled cnt cls) =
             <a>#{cnt}
         |]
 
+-- | Default widget config provided for easy overriding of only some fields.
+defaultPageWidgetConfig :: PageWidgetConfig
+defaultPageWidgetConfig = PageWidgetConfig { prevText     = "«"
+                                           , nextText     = "»"
+                                           , pageCount    = 9
+                                           , ascending    = True
+                                           , showEllipsis = True
+                                           , listClasses  = []
+                                           }
+
 defaultWidget :: Yesod m => PageWidget m
-defaultWidget = paginationWidget $ PageWidgetConfig { prevText     = "«"
-                                                    , nextText     = "»"
-                                                    , pageCount    = 9
-                                                    , ascending    = True
-                                                    , showEllipsis = True
-                                                    }
+defaultWidget = paginationWidget defaultPageWidgetConfig
 
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
@@ -74,12 +82,15 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
         curParams <- handlerToWidget $ liftM reqGetParams getRequest
 
         [whamlet|$newline never
-            <ul>
+            <ul class="#{cls}">
                 $forall link <- buildLinks page pages
                     ^{showLink curParams link}
             |]
 
     where
+        -- | Concatenate all additional classes.
+        cls = T.intercalate " " listClasses
+
         -- | Build up each component of the overall list of links. We'll
         --   use empty lists to denote ommissions along the way then
         --   concatenate.
