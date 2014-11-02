@@ -25,6 +25,7 @@ data PageWidgetConfig = PageWidgetConfig
     { prevText     :: Text   -- ^ The text for the 'previous page' link.
     , nextText     :: Text   -- ^ The text for the 'next page' link.
     , pageCount    :: Int    -- ^ The number of page links to show
+    , maxPageLinks :: Maybe Int  -- ^ Propose links up to this number of pages
     , ascending    :: Bool   -- ^ Whether to list pages in ascending order.
     , showEllipsis :: Bool   -- ^ Whether to show an ellipsis if there are
                              --   more pages than pageCount
@@ -64,6 +65,7 @@ defaultPageWidgetConfig :: PageWidgetConfig
 defaultPageWidgetConfig = PageWidgetConfig { prevText     = "«"
                                            , nextText     = "»"
                                            , pageCount    = 9
+                                           , maxPageLinks = Nothing
                                            , ascending    = True
                                            , showEllipsis = True
                                            , listClasses  = ["pagination"]
@@ -102,11 +104,11 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 
                 -- these always appear
                 prevLink = [(if null prev then Disabled else Enabled (pg - 1)) prevText "prev"]
-                nextLink = [(if null next then Disabled else Enabled (pg + 1)) nextText "next"]
+                nextLink = [(if null next || not (pageWithinBounds pg) then Disabled else Enabled (pg + 1)) nextText "next"]
 
                 -- show first/last unless we're on it
                 firstLink = [ Enabled 1   "1"        "prev" | pg > 1   ]
-                lastLink  = [ Enabled pgs (showT pgs) "next" | pg < pgs ]
+                lastLink  = [ display "next" pgs | pg < pgs ]
 
                 -- we'll show ellipsis if there are enough links that some will
                 -- be ommitted from the list
@@ -115,11 +117,19 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 
                 -- the middle lists, strip the first/last pages and
                 -- correctly take up to limit away from current
-                prevLinks = reverse . take pageCount . reverse . drop 1 $ map (\p -> Enabled p (showT p) "prev") prev
-                nextLinks = take pageCount . reverse . drop 1 . reverse $ map (\p -> Enabled p (showT p) "next") next
+                prevLinks = reverse . take pageCount . reverse . drop 1 $ map (display "prev") prev
+                nextLinks = take pageCount . reverse . drop 1 . reverse $ map (display "next") next
 
                 -- finally, this page itself
                 curLink = [Disabled (showT pg) "active"]
+
+                pageWithinBounds p = case maxPageLinks of
+                    Nothing -> True
+                    Just m  -> if p > m then False
+                                       else True
+                display cls p = if (pageWithinBounds p)
+                    then Enabled p (showT p) cls
+                    else Disabled (showT p) cls
 
             in concat $ (if ascending then id else reverse) [ prevLink
                       , firstLink
