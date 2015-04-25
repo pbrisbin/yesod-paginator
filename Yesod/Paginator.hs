@@ -76,9 +76,9 @@ paginateWith widget per items = do
     return (xs, widget p per tot)
 
 selectPaginated :: ( PersistEntity val
-                   , (PersistQuery (YesodPersistBackend m (HandlerT m IO)))
-                   , (PersistMonadBackend (YesodPersistBackend m (HandlerT m IO)) ~ PersistEntityBackend val)
-                   , (MonadTrans (YesodPersistBackend m))
+                   , PersistEntityBackend val ~ YesodPersistBackend m
+                   , PersistQuery m
+                   , PersistQuery (YesodPersistBackend m)
                    , Yesod m
                    )
                 => Int
@@ -88,9 +88,9 @@ selectPaginated :: ( PersistEntity val
 selectPaginated = selectPaginatedWith defaultWidget
 
 selectPaginatedWith :: ( PersistEntity val
-                       , (PersistQuery (YesodPersistBackend m (HandlerT m IO)))
-                       , (PersistMonadBackend (YesodPersistBackend m (HandlerT m IO)) ~ PersistEntityBackend val)
-                       , (MonadTrans (YesodPersistBackend m))
+                       , PersistEntityBackend val ~ YesodPersistBackend m
+                       , (PersistQuery (YesodPersistBackend m))
+                       , PersistQuery (YesodPersistBackend m)
                        , Yesod m
                        )
                     => PageWidget m
