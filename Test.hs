@@ -19,7 +19,7 @@ instance Yesod App where
     approot = ApprootRelative
     defaultLayout widget = do
         pc <- widgetToPageContent widget
-        giveUrlRenderer [hamlet|$newline never
+        withUrlRenderer [hamlet|$newline never
             $doctype 5
             <html lang="en">
                 <head>
@@ -35,7 +35,7 @@ instance Yesod App where
 getRootR :: Handler Html
 getRootR = do
     -- unneeded return here to match README
-    things' <- return [1..1142]
+    things' <- return [1..1142] :: Handler [Int]
 
     (things, widget) <- paginate 3 things'
     
