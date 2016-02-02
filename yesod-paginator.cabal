@@ -31,8 +31,12 @@ test-suite test
     hs-source-dirs:     test
     ghc-options:        -Wall
     build-depends:      base
-                      , yesod-paginator
                       , hspec
+                      , yesod-paginator
+                      , data-default
+                      , wai-extra
+                      , yesod-core
+                      , yesod-test
 
 source-repository       head
   type:                 git
