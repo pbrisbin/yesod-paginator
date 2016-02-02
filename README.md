@@ -82,13 +82,3 @@ getPageR = do
             , listClasses  = ["pagination", "pagination-centered"]
             }
 ```
-
-## Testing
-
-```
-$ cabal install warp
-$ cabal install
-$ runhaskell ./Test.hs
-$ $BROWSER http://localhost:3000
-```
-
