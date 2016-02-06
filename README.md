@@ -1,6 +1,6 @@
 # Yesod paginator
 
-Handle a database query and/or array-math to paginate a list and produce 
+Handle a database query and/or array-math to paginate a list and produce
 a pagination widget suitable for [Bootstrap][].
 
 [bootstrap]: http://getbootstrap.com/components/#pagination
@@ -82,3 +82,16 @@ getPageR = do
             , listClasses  = ["pagination", "pagination-centered"]
             }
 ```
+
+## Example and Tests
+
+Run a local example:
+
+```bash
+stack build --flag yesod-paginator:example
+stack exec yesod-paginator-example
+```
+
+Then open [http://localhost:3000](http://localhost:3000/) in the browser.
+
+To run the tests, execute `stack test`

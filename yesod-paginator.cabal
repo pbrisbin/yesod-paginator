@@ -11,6 +11,10 @@ category:               Web, Yesod
 build-type:             Simple
 cabal-version:          >=1.8
 
+flag example
+  description: Build the example application
+  default: False
+
 library
   hs-source-dirs:       src
   exposed-modules:      Yesod.Paginator
@@ -37,6 +41,20 @@ test-suite test
                       , wai-extra
                       , yesod-core
                       , yesod-test
+
+executable yesod-paginator-example
+  if flag(example)
+    buildable: True
+  else
+    buildable: False
+
+  main-is:              Main.hs
+  hs-source-dirs:       example
+  ghc-options:          -Wall
+  build-depends:        base
+                      , yesod
+                      , yesod-paginator
+                      , warp
 
 source-repository       head
   type:                 git
