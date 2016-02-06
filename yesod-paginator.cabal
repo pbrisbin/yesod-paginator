@@ -38,6 +38,15 @@ test-suite test
                       , yesod-core
                       , yesod-test
 
+Executable example
+    main-is:            Main.hs
+    hs-source-dirs:     example
+    ghc-options:        -Wall
+    build-depends:      base
+                      , yesod
+                      , yesod-paginator
+                      , warp
+
 source-repository       head
   type:                 git
   location:             git://github.com/pbrisbin/yesod-paginator.git
