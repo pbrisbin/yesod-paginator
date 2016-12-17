@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts  #-}
@@ -76,7 +77,11 @@ paginateWith widget per items = do
     return (xs, widget p per tot)
 
 selectPaginated :: ( PersistEntity val
+#if MIN_VERSION_persistent(2, 5, 0)
+                   , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend m)
+#else
                    , PersistEntityBackend val ~ YesodPersistBackend m
+#endif
                    , PersistQuery (YesodPersistBackend m)
                    , Yesod m
                    )
@@ -87,7 +92,11 @@ selectPaginated :: ( PersistEntity val
 selectPaginated = selectPaginatedWith defaultWidget
 
 selectPaginatedWith :: ( PersistEntity val
+#if MIN_VERSION_persistent(2, 5, 0)
+                       , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend m)
+#else
                        , PersistEntityBackend val ~ YesodPersistBackend m
+#endif
                        , PersistQuery (YesodPersistBackend m)
                        , Yesod m
                        )
