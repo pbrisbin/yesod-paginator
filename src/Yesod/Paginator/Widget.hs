@@ -9,6 +9,8 @@ module Yesod.Paginator.Widget
  , defaultPageWidgetConfig
  , PageWidget
  , PageWidgetConfig(..)
+ , PageLink(..)
+ , showLink
  ) where
 
 import Yesod
