@@ -52,7 +52,7 @@ showLink params (Enabled pg cnt cls) = do
 
     where
         updateGetParam :: [(Text,Text)] -> (Text,Text) -> Text
-        updateGetParam getParams (p, n) = (T.cons '?') . T.intercalate "&"
+        updateGetParam getParams (p, n) = T.cons '?' . T.intercalate "&"
                                         . map (\(k,v) -> k `T.append` "=" `T.append` v)
                                         . (++ [(p, n)]) . filter ((/= p) . fst) $ getParams
 
@@ -78,9 +78,9 @@ defaultWidget = paginationWidget defaultPageWidgetConfig
 -- | A widget showing pagination links. Follows bootstrap principles.
 --   Utilizes a \"p\" GET param but leaves all other GET params intact.
 paginationWidget :: Yesod m => PageWidgetConfig -> PageWidget m
-paginationWidget (PageWidgetConfig {..}) page per tot = do
+paginationWidget PageWidgetConfig {..} page per tot = do
     -- total / per + 1 for any remainder
-    let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
+    let pages = (\(n, r) -> n + min r 1) $ tot `divMod` per
 
     when (pages > 1) $ do
         curParams <- handlerToWidget $ liftM reqGetParams getRequest
@@ -141,9 +141,9 @@ paginationWidget (PageWidgetConfig {..}) page per tot = do
 --   ignores all of the values with the exception of the text for the next and
 --   previous links.
 simplePaginationWidget :: Yesod m => PageWidgetConfig -> PageWidget m
-simplePaginationWidget (PageWidgetConfig {..}) page per tot = do
+simplePaginationWidget PageWidgetConfig {..} page per tot = do
     -- total number of pages
-    let pages = (\(n, r) -> n + (min r 1)) $ tot `divMod` per
+    let pages = (\(n, r) -> n + min r 1) $ tot `divMod` per
 
     when (pages > 1) $ do
         curParams <- handlerToWidget $ liftM reqGetParams getRequest
@@ -156,10 +156,9 @@ simplePaginationWidget (PageWidgetConfig {..}) page per tot = do
 
     where
         buildLinks :: Int -> Int -> [PageLink]
-        buildLinks pg pgs = concat
-            [ [ Enabled (pg - 1) prevText "prev" | pg > 1 ]
-            , [ Enabled (pg + 1) nextText "next" | pg < pgs ]
-            ]
+        buildLinks pg pgs =
+            [ Enabled (pg - 1) prevText "prev" | pg > 1 ] ++
+            [ Enabled (pg + 1) nextText "next" | pg < pgs ]
 
 -- | looks up the \"p\" GET param and converts it to an Int. returns a
 --   default of 1 when conversion fails.

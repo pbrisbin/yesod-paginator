@@ -10,13 +10,13 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = withApp $ do
-    describe "paginated" $ do
+spec = withApp $
+    describe "paginated" $
         it "works" $ do
             get $ RootR 1142
 
             statusIs 200
-            bodyContains $ concat $
+            bodyContains $ concat
                 [ "<ul class=\"pagination\">"
                 , "<li class=\"prev disabled\"><a>«</a></li>"
                 , "<li class=\"active disabled\"><a>1</a></li>"
@@ -40,7 +40,7 @@ spec = withApp $ do
                 setUrl $ RootR 1142
 
             statusIs 200
-            bodyContains $ concat $
+            bodyContains $ concat
                 [ "<ul class=\"pagination\">"
                 , "<li class=\"prev\"><a href=\"?p=87\">«</a></li>"
                 , "<li class=\"prev\"><a href=\"?p=1\">1</a></li>"
