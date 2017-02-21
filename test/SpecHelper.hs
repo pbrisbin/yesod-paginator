@@ -24,7 +24,7 @@ instance Yesod App
 
 getRootR :: Int -> Handler Html
 getRootR count = do
-    things' <- return [1..count]
+    let things' = [1..count]
 
     (things, widget) <- paginate 3 things'
 
