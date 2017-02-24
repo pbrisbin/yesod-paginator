@@ -48,17 +48,35 @@
 -- items (or Entities) to display on this page and the second being a
 -- widget showing the pagination navagation links.
 --
+--
+-- The third example omits the widget and provides some flexibility in terms
+-- of naming the pagination parameter (can be useful if returning JSON)
+--
+-- > getSomeRoute :: Handler Value
+-- > getSomeRoute something = do
+-- >     -- note: you can use paginators function getCurrentPage or your own implementation
+-- >     page   <- getCurrentPage
+-- >
+-- >     -- note: things is [Entity val] just like selectList returns
+-- >     things <- runDB $ selectPaginatedEntities page 10 [SomeThing ==. something] []
+-- >
+-- >     returnJson things
+--
+--
 -------------------------------------------------------------------------------
 module Yesod.Paginator
     ( paginate
     , paginateWith
     , selectPaginated
     , selectPaginatedWith
+    , selectPaginatedEntities
     , module Yesod.Paginator.Widget
     ) where
 
 import Yesod
 import Yesod.Paginator.Widget
+
+
 
 paginate :: Yesod m => Int -> [a] -> HandlerT m IO ([a], WidgetT m IO ())
 paginate = paginateWith defaultWidget
@@ -68,13 +86,15 @@ paginateWith :: Yesod m
              -> Int
              -> [a]
              -> HandlerT m IO ([a], WidgetT m IO ())
-paginateWith widget per items = do
-    p <- getCurrentPage
+paginateWith widget itemsPerPage items = do
+    page <- getCurrentPage
 
-    let tot = length items
-    let  xs = take per $ drop ((p - 1) * per) items
+    let total = length items
+    let  xs   = take itemsPerPage $ drop ((page - 1) * itemsPerPage) items
 
-    return (xs, widget p per tot)
+    pure (xs, widget page itemsPerPage total)
+
+
 
 selectPaginated :: ( PersistEntity val
 #if MIN_VERSION_persistent(2, 5, 0)
@@ -91,6 +111,8 @@ selectPaginated :: ( PersistEntity val
                 -> YesodDB m ([Entity val], WidgetT m IO ())
 selectPaginated = selectPaginatedWith defaultWidget
 
+
+
 selectPaginatedWith :: ( PersistEntity val
 #if MIN_VERSION_persistent(2, 5, 0)
                        , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend m)
@@ -105,9 +127,32 @@ selectPaginatedWith :: ( PersistEntity val
                     -> [Filter val]
                     -> [SelectOpt val]
                     -> YesodDB m ([Entity val], WidgetT m IO ())
-selectPaginatedWith widget per filters selectOpts = do
-    p   <- lift getCurrentPage
-    tot <- count filters
-    xs  <- selectList filters (selectOpts ++ [OffsetBy ((p-1)*per), LimitTo per])
+selectPaginatedWith widget itemsPerPage filters selectOpts = do
+    page   <- lift getCurrentPage
+    total  <- count filters
+    let paginationOptions = [OffsetBy ((page-1)*itemsPerPage), LimitTo itemsPerPage]
+    xs     <- selectList filters (selectOpts ++ paginationOptions)
 
-    return (xs, widget p per tot)
+    pure (xs, widget page itemsPerPage total)
+
+
+
+selectPaginatedEntities :: ( PersistEntity val
+#if MIN_VERSION_persistent(2, 5, 0)
+                   , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend m)
+#else
+                   , PersistEntityBackend val ~ YesodPersistBackend m
+#endif
+                   , PersistQuery (YesodPersistBackend m)
+                   , Yesod m
+                   )
+                => Int
+                -> Int
+                -> [Filter val]
+                -> [SelectOpt val]
+                -> YesodDB m [Entity val]
+selectPaginatedEntities page itemsPerPage filters selectOpts = do
+    let paginationOptions = [OffsetBy ((page-1)*itemsPerPage), LimitTo itemsPerPage]
+    xs     <- selectList filters (selectOpts ++ paginationOptions)
+
+    pure xs
