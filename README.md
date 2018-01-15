@@ -1,15 +1,15 @@
 # Yesod paginator
 
-Handle a database query and/or array-math to paginate a list and produce
-a pagination widget suitable for [Bootstrap][].
+Handle a database query and/or array-math to paginate a list and produce a
+pagination widget suitable for [Bootstrap][].
 
 [bootstrap]: http://getbootstrap.com/components/#pagination
 
 ## Usage
 
-Paginate directly out of the database:
+### DB Entities
 
-```haskell
+```hs
 getPageR :: Handler Html
 getPageR = do
     (things, widget) <- runDB $ selectPaginated 10 [] []
@@ -23,9 +23,9 @@ getPageR = do
             |]
 ```
 
-Or an existing list in memory:
+### Pure List
 
-```haskell
+```hs
 getPageR :: Handler Html
 getPageR = do
     things' <- getAllThings
@@ -41,9 +41,9 @@ getPageR = do
             |]
 ```
 
-Just provide the pagination widget:
+### Pre-paginated
 
-```haskell
+```hs
 getPageR :: Handler Html
 getPageR = do
     cur <- getCurrentPage
@@ -61,9 +61,9 @@ getPageR = do
           |]
 ```
 
-## Customization
+### Customization
 
-```haskell
+```hs
 getPageR :: Handler Html
 getPageR = do
     (things, widget) <- selectPaginatedWith myWidget 10 [] []
@@ -83,15 +83,13 @@ getPageR = do
             }
 ```
 
-## Example and Tests
+## Development & Tests
 
-Run a local example:
-
-```bash
-stack build --flag yesod-paginator:example
-stack exec yesod-paginator-example
+```console
+stack setup
+stack build --pedantic --test
 ```
 
-Then open [http://localhost:3000](http://localhost:3000/) in the browser.
+---
 
-To run the tests, execute `stack test`
+[CHANGELOG](./CHANGELOG.md) | [LICENSE](./LICENSE)
