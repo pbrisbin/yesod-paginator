@@ -1,7 +1,7 @@
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
 module Yesod.Paginator.Widget
  ( getCurrentPage
  , paginationWidget
@@ -14,10 +14,10 @@ module Yesod.Paginator.Widget
  , showLink
  ) where
 
-import Yesod
-import Control.Monad (when, liftM)
-import Data.Maybe    (fromMaybe)
+import Control.Monad (when)
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
+import Yesod
 
 import qualified Data.Text as T
 
@@ -83,7 +83,7 @@ paginationWidget PageWidgetConfig {..} page per tot = do
     let pages = (\(n, r) -> n + min r 1) $ tot `divMod` per
 
     when (pages > 1) $ do
-        curParams <- handlerToWidget $ liftM reqGetParams getRequest
+        curParams <- handlerToWidget $ reqGetParams <$> getRequest
 
         [whamlet|$newline never
             <ul class="#{cls}">
@@ -146,7 +146,7 @@ simplePaginationWidget PageWidgetConfig {..} page per tot = do
     let pages = (\(n, r) -> n + min r 1) $ tot `divMod` per
 
     when (pages > 1) $ do
-        curParams <- handlerToWidget $ liftM reqGetParams getRequest
+        curParams <- handlerToWidget $ reqGetParams <$> getRequest
 
         [whamlet|$newline never
             <ul class="pagination">
@@ -163,7 +163,7 @@ simplePaginationWidget PageWidgetConfig {..} page per tot = do
 -- | looks up the \"p\" GET param and converts it to an Int. returns a
 --   default of 1 when conversion fails.
 getCurrentPage :: Yesod m => HandlerT m IO Int
-getCurrentPage = liftM (fromMaybe 1 . go) $ lookupGetParam "p"
+getCurrentPage = fromMaybe 1 . go <$> lookupGetParam "p"
 
     where
         go :: Maybe Text -> Maybe Int

@@ -28,7 +28,13 @@ getRootR count = do
 
     (things, widget) <- paginate 3 things'
 
-    defaultLayout [whamlet|^{widget}|]
+    defaultLayout [whamlet|
+        <ul>
+            $forall thing <- things
+                <li>#{show thing}
+
+        ^{widget}
+    |]
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ do
