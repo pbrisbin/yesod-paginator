@@ -1,0 +1,36 @@
+---
+name: yesod-paginator
+version: '0.11.0'
+synopsis: A pagination approach for yesod
+description: Paginate a list showing a per-item widget and links to other pages
+category: Web, Yesod
+author: Patrick Brisbin
+maintainer: pbrisbin@gmail.com
+license: BSD3
+homepage: http://github.com/pbrisbin/yesod-paginator
+git: git://github.com/pbrisbin/yesod-paginator.git
+
+dependencies:
+  - base >=4 && <5
+
+ghc-options: -Wall
+
+library:
+  source-dirs: src
+  dependencies:
+    - text >=0.11 && <2.0
+    - yesod >=1.4
+    - persistent >=2.0
+    - transformers
+
+tests:
+  test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - hspec
+      - yesod-paginator
+      - data-default
+      - wai-extra
+      - yesod-core
+      - yesod-test
