@@ -1,8 +1,6 @@
-{-# LANGUAGE CPP               #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeFamilies #-}
 -------------------------------------------------------------------------------
 -- |
 --

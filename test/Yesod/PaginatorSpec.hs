@@ -1,13 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Yesod.PaginatorSpec
-    ( main
-    , spec
+    ( spec
     ) where
 
 import SpecHelper
-
-main :: IO ()
-main = hspec spec
 
 spec :: Spec
 spec = withApp $
