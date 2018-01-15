@@ -1,0 +1,8 @@
+---
+- package:
+  - name: yesod-paginator
+  - section:
+    - name: test:test
+    - message:
+      - name: Weeds exported
+      - module: SpecHelper
