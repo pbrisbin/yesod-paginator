@@ -10,8 +10,8 @@ dependencies:
     - "~/.stack"
     - ".stack-work"
   pre:
-    - wget https://github.com/commercialhaskell/stack/releases/download/v1.3.2/stack-1.3.2-linux-x86_64.tar.gz -O /tmp/stack.tar.gz
-    - tar xvzOf /tmp/stack.tar.gz stack-1.3.2-linux-x86_64/stack > /tmp/stack
+    - wget https://github.com/commercialhaskell/stack/releases/download/v1.6.3/stack-1.6.3-linux-x86_64.tar.gz -O /tmp/stack.tar.gz
+    - tar xvzOf /tmp/stack.tar.gz stack-1.6.3-linux-x86_64/stack > /tmp/stack
     - chmod +x /tmp/stack && sudo mv /tmp/stack /usr/bin/stack
   override:
     - stack setup
