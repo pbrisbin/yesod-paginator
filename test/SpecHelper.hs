@@ -29,7 +29,7 @@ getRootR count = do
     defaultLayout [whamlet|
         <ul>
             $forall thing <- things
-                <li>#{show thing}
+                <li .thing>#{show thing}
 
         ^{widget}
     |]

@@ -12,6 +12,7 @@ spec = withApp $
             get $ RootR 1142
 
             statusIs 200
+            htmlCount ".thing" 3
             bodyContains $ concat
                 [ "<ul class=\"pagination\">"
                 , "<li class=\"prev disabled\"><a>«</a></li>"
@@ -36,6 +37,7 @@ spec = withApp $
                 setUrl $ RootR 1142
 
             statusIs 200
+            htmlCount ".thing" 3
             bodyContains $ concat
                 [ "<ul class=\"pagination\">"
                 , "<li class=\"prev\"><a href=\"?p=87\">«</a></li>"
