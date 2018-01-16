@@ -8,8 +8,6 @@ module SpecHelper
     , module X
     ) where
 
-import Data.Default (def)
-import Network.Wai.Middleware.RequestLogger (mkRequestLogger)
 import Yesod.Core
 import Yesod.Paginator (paginate)
 
@@ -37,7 +35,4 @@ getRootR count = do
     |]
 
 withApp :: SpecWith (TestApp App) -> Spec
-withApp = before $ do
-    logger <- mkRequestLogger def
-
-    return (App, logger)
+withApp = before $ pure (App, id)
