@@ -30,7 +30,5 @@ tests:
     dependencies:
       - hspec
       - yesod-paginator
-      - data-default
-      - wai-extra
       - yesod-core
       - yesod-test
