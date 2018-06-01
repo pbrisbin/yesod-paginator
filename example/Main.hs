@@ -1,13 +1,15 @@
-{-# LANGUAGE QuasiQuotes           #-}
-{-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE TemplateHaskell       #-}
-{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-module Main where
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# OPTIONS_GHC -fno-warn-unused-top-binds #-}
 
+module Main (main) where
+
+import Network.Wai.Handler.Warp (run)
 import Yesod
 import Yesod.Paginator
-import Network.Wai.Handler.Warp (run)
 
 data App = App
 
@@ -34,10 +36,9 @@ instance Yesod App where
 
 getRootR :: Handler Html
 getRootR = do
-    -- unneeded return here to match README
-    things' <- return [1..1142] :: Handler [Int]
+    let things' = [1..1142] :: [Int]
 
-    (things, widget) <- paginate 3 things'
+    pages <- paginate 3 things'
 
     defaultLayout $ do
         setTitle "My title"
@@ -45,11 +46,11 @@ getRootR = do
             <h1>Pagination
             <p>The things:
             <ul>
-                $forall thing <- things
+                $forall thing <- pageItems $ pagesCurrent pages
                     <li>Thing #{show thing}
 
             <div .pagination>
-                ^{widget}
+                ^{simple 10 pages}
             |]
 
 main :: IO ()
