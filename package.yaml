@@ -23,6 +23,15 @@ library:
     - persistent >=2.0
     - transformers
 
+executables:
+  yesod-paginator-example:
+    main: Main.hs
+    source-dirs: example
+    dependencies:
+      - warp
+      - yesod
+      - yesod-paginator
+
 tests:
   test:
     main: Spec.hs
