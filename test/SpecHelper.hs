@@ -3,36 +3,37 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ViewPatterns #-}
+
 module SpecHelper
     ( module SpecHelper
     , module X
-    ) where
-
-import Yesod.Core
-import Yesod.Paginator (paginate)
+    )
+where
 
 import Test.Hspec as X
+import Yesod.Core
+import Yesod.Paginator as X
+import Yesod.Paginator.Prelude as X
 import Yesod.Test as X
 
 data App = App
 
-mkYesod "App" [parseRoutes| /#Int RootR GET |]
+mkYesod "App" [parseRoutes|
+    /simple/#ItemsCount/#PerPage/#Natural SimpleR GET
+    /ellipsed/#ItemsCount/#PerPage/#Natural EllipsedR GET
+|]
 
 instance Yesod App
 
-getRootR :: Int -> Handler Html
-getRootR count = do
-    let things' = [1..count]
+getSimpleR :: ItemsCount -> PerPage -> Natural -> Handler Html
+getSimpleR total per elements = do
+    pages <- paginate per $ genericReplicate total ()
+    defaultLayout [whamlet|^{simple elements pages}|]
 
-    (things, widget) <- paginate 3 things'
-
-    defaultLayout [whamlet|
-        <ul>
-            $forall thing <- things
-                <li .thing>#{show thing}
-
-        ^{widget}
-    |]
+getEllipsedR :: ItemsCount -> PerPage -> Natural -> Handler Html
+getEllipsedR total per elements = do
+    pages <- paginate per $ genericReplicate total ()
+    defaultLayout [whamlet|^{ellipsed elements pages}|]
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)
