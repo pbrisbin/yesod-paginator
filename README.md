@@ -1,86 +1,21 @@
-# Yesod paginator
+# yesod-paginator
 
-Handle a database query and/or array-math to paginate a list and produce a
-pagination widget suitable for [Bootstrap][].
-
-[bootstrap]: http://getbootstrap.com/components/#pagination
+Handle a database query and/or array-math to paginate a list and produce a page
+of items along with a pagination widget for navigating them.
 
 ## Usage
 
-### DB Entities
+See the top-level [module documentation][docs].
 
-```hs
-getPageR :: Handler Html
-getPageR = do
-    (things, widget) <- runDB $ selectPaginated 10 [] []
+[docs]: http://hackage.haskell.org/package/yesod-paginator/docs/Yesod-Paginator.html
 
-    defaultLayout $ do
-        [whamlet|
-            $forall thing <- things
-                ^{showThing $ snd thing}
+## Examples
 
-            ^{widget}
-            |]
-```
+See the [example](./example/Main.hs). Run it with
 
-### Pure List
-
-```hs
-getPageR :: Handler Html
-getPageR = do
-    things' <- getAllThings
-
-    (things, widget) <- paginate 10 things'
-
-    defaultLayout $ do
-        [whamlet|
-            $forall thing <- things
-                ^{showThing thing}
-
-            ^{widget}
-            |]
-```
-
-### Pre-paginated
-
-```hs
-getPageR :: Handler Html
-getPageR = do
-    cur <- getCurrentPage
-
-    let limit = 10
-
-    (items, total) <- runSphinxSearch "query" limit
-
-    defaultLayout $ do
-        [whamlet|
-          $forall thing <- things
-              ^{showThing thing}
-
-          ^{defaultWidget cur limit total}
-          |]
-```
-
-### Customization
-
-```hs
-getPageR :: Handler Html
-getPageR = do
-    (things, widget) <- selectPaginatedWith myWidget 10 [] []
-
-    defaultLayout $ do
-        -- ...
-
-    where
-        myWidget :: PageWidget App
-        myWidget = paginationWidget $ PageWidgetConfig
-            { prevText     = "Newer"
-            , nextText     = "Older"
-            , pageCount    = 7
-            , ascending    = False
-            , showEllipsis = False
-            , listClasses  = ["pagination", "pagination-centered"]
-            }
+```console
+stack build --flag yesod-paginator:examples
+stack exec yesod-paginator-example
 ```
 
 ## Development & Tests

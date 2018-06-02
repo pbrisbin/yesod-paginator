@@ -18,10 +18,29 @@ ghc-options: -Wall
 library:
   source-dirs: src
   dependencies:
+    - blaze-markup
+    - path-pieces
+    - persistent >=2.5
+    - safe
     - text >=0.11 && <2.0
-    - yesod >=1.4
-    - persistent >=2.0
     - transformers
+    - uri-encode
+    - yesod-core >=1.4
+    - yesod-persistent >= 1.4
+  default-extensions:
+    - NoImplicitPrelude
+
+executables:
+  yesod-paginator-example:
+    main: Main.hs
+    source-dirs: example
+    dependencies:
+      - warp
+      - yesod
+      - yesod-paginator
+    when:
+      - condition: ! '!(flag(examples))'
+        buildable: false
 
 tests:
   test:
@@ -32,3 +51,14 @@ tests:
       - yesod-paginator
       - yesod-core
       - yesod-test
+  doctests:
+    main: Main.hs
+    source-dirs: doctest
+    dependencies:
+      - doctest
+
+flags:
+  examples:
+    description: Build the examples
+    manual: false
+    default: false
