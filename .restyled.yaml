@@ -3,8 +3,10 @@ restylers:
   - stylish-haskell:
       include:
         - "**/*.hs"
-        - "!src/Yesod/Paginator/Pages.hs"  # avoid DerivingStrategies
+        - "!src/Yesod/Paginator/Pages.hs"       # avoid DerivingStrategies
   - brittany:
       include:
         - "**/*.hs"
-        - "!src/Yesod/Paginator/Pages.hs"  # avoid DerivingStrategies
+        - "!src/Yesod/Paginator/Pages.hs"       # avoid DerivingStrategies
+        - "!example/Main.hs"                    # HsSpliceE
+        - "!src/Yesod/Paginator/Widgets.hs"     # HsSpliceE
