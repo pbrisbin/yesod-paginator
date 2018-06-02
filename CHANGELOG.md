@@ -1,5 +1,20 @@
 ## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v0.11.0...master)
 
+- Major rewrite
+
+  Interfaces for `paginate` and `selectPaginated` now return a `Pages a` type,
+  free of any visuals-related concerns. This value provides the paginated items
+  and can be passed to functions from the `Widgets` model for rendering
+  navigation HTML.
+
+  The `ellipsed` widget is most like previous behavior with `simple` being a
+  new, simpler alternative. These are (for the most part) not configurable, we
+  should instead strive to create separate widgets if we need different
+  behavior.
+
+  Everything is now very type-safe: we use `Natural` everywhere, with `newtype`s
+  to differentiate things like `PerPage`, `PageNumber`s, etc.
+
 - Officially drop support for GHC < 7.10
 
 ## [v0.11.0](https://github.com/pbrisbin/yesod-paginator/compare/v0.10.1...v0.11.0)
