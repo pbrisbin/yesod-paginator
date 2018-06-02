@@ -1,6 +1,7 @@
 ---
 restylers:
-  - stylish-haskell
+  - stylish-haskell:
+      include:
         - "**/*.hs"
         - "!src/Yesod/Paginator/Pages.hs"  # avoid DerivingStrategies
   - brittany:
