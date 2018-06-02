@@ -26,7 +26,7 @@ lint:
 
 .PHONY: docs
 docs:
-	stack --work-dir .stack-work.docs build --haddocks
+	stack --work-dir .stack-work-docs build --haddock
 
 .PHONY: check-nightly
 check-nightly:
