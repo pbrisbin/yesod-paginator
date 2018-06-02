@@ -16,7 +16,9 @@ build:
 
 .PHONY: test
 test:
-	stack test
+	stack build \
+	  --flag yesod-paginator:examples \
+	  --pedantic --test
 
 
 .PHONY: lint
