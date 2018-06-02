@@ -15,7 +15,7 @@ import Network.URI.Encode (encodeText)
 import Yesod.Core
 import Yesod.Paginator.Pages
 
-type PaginationWidget m a = Pages a -> WidgetT m IO ()
+type PaginationWidget site a = Pages a -> WidgetFor site ()
 
 -- | Simple widget, limited to show the given number of total page elements
 --
@@ -159,7 +159,7 @@ getBalancedPages elements pages =
     prevPagesNaive = takePreviousPages (elements `div` 2) pages
     prevPagesCalcd = takePreviousPages (elements - genericLength nextPages - 1) pages
 
-getUpdateGetParams :: WidgetT m IO (PageNumber -> [(Text, Text)])
+getUpdateGetParams :: WidgetFor site (PageNumber -> [(Text, Text)])
 getUpdateGetParams = do
     params <- handlerToWidget $ reqGetParams <$> getRequest
     pure $ \number -> nubOn fst $ [("p", tshow number)] <> params

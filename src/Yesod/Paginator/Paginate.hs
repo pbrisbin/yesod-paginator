@@ -19,7 +19,7 @@ import Yesod.Paginator.Pages
 import Yesod.Persist.Core
 
 -- | Paginate a list of items
-paginate :: Yesod m => PerPage -> [a] -> HandlerT m IO (Pages a)
+paginate :: Yesod site => PerPage -> [a] -> HandlerFor site (Pages a)
 paginate per items = paginate' per items <$> getCurrentPage
 
 -- | A version where the current page is given
