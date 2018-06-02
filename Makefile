@@ -26,6 +26,10 @@ lint:
 	hlint .
 	weeder .
 
+.PHONY: clean
+clean:
+	stack clean
+
 .PHONY: docs
 docs:
 	stack --work-dir .stack-work-docs build --haddock
