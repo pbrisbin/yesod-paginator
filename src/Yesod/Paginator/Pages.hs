@@ -75,7 +75,7 @@ data Pages a = Pages
 -- [2,3,4]
 --
 takePreviousPages :: Natural -> Pages a -> [PageNumber]
-takePreviousPages n = reverse . take (fromIntegral n) . reverse . pagesPrevious
+takePreviousPages n = reverse . genericTake n . reverse . pagesPrevious
 
 -- | Take next pages, going forward from current
 --
@@ -83,7 +83,7 @@ takePreviousPages n = reverse . take (fromIntegral n) . reverse . pagesPrevious
 -- [3,4,5]
 --
 takeNextPages :: Natural -> Pages a -> [PageNumber]
-takeNextPages n = take (fromIntegral n) . pagesNext
+takeNextPages n = genericTake n . pagesNext
 
 -- | The previous page number, if it exists
 --
