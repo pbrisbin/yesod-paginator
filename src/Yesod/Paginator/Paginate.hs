@@ -43,50 +43,50 @@ paginate per items = paginate' per items <$> getCurrentPage
 --
 paginate' :: PerPage -> [a] -> PageNumber -> Pages a
 paginate' per items p =
-    toPages p per (genericLength items) $ genericTake per $ genericDrop
-        (pageOffset p per)
-        items
+  toPages p per (genericLength items) $ genericTake per $ genericDrop
+    (pageOffset p per)
+    items
 
 -- | Paginate out of a persistent database
 selectPaginated
-    :: ( PersistEntity val
-       , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend site)
-       , PersistQuery (YesodPersistBackend site)
-       , Yesod site
-       )
-    => PerPage
-    -> [Filter val]
-    -> [SelectOpt val]
-    -> YesodDB site (Pages (Entity val))
+  :: ( PersistEntity val
+     , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend site)
+     , PersistQuery (YesodPersistBackend site)
+     , Yesod site
+     )
+  => PerPage
+  -> [Filter val]
+  -> [SelectOpt val]
+  -> YesodDB site (Pages (Entity val))
 selectPaginated per filters options =
-    selectPaginated' per filters options =<< lift getCurrentPage
+  selectPaginated' per filters options =<< lift getCurrentPage
 
 -- | A version where the current page is given
 --
 -- This can be used to avoid the Yesod context
 --
 selectPaginated'
-    :: ( MonadIO m
-       , PersistEntity record
-       , PersistEntityBackend record ~ BaseBackend backend
-       , PersistQueryRead backend
-       )
-    => PerPage
-    -> [Filter record]
-    -> [SelectOpt record]
-    -> PageNumber
-    -> ReaderT backend m (Pages (Entity record))
+  :: ( MonadIO m
+     , PersistEntity record
+     , PersistEntityBackend record ~ BaseBackend backend
+     , PersistQueryRead backend
+     )
+  => PerPage
+  -> [Filter record]
+  -> [SelectOpt record]
+  -> PageNumber
+  -> ReaderT backend m (Pages (Entity record))
 selectPaginated' per filters options p =
-    toPages p per <$> (fromIntegral <$> count filters) <*> selectList
-        filters
-        (options
-        <> [ OffsetBy $ fromIntegral $ pageOffset p per
-           , LimitTo $ fromIntegral per
-           ]
-        )
+  toPages p per <$> (fromIntegral <$> count filters) <*> selectList
+    filters
+    (  options
+    <> [ OffsetBy $ fromIntegral $ pageOffset p per
+       , LimitTo $ fromIntegral per
+       ]
+    )
 
 getCurrentPage :: MonadHandler m => m PageNumber
 getCurrentPage = fromMaybe 1 . go <$> lookupGetParam "p"
-  where
-    go :: Maybe Text -> Maybe PageNumber
-    go mp = readIntegral . unpack =<< mp
+ where
+  go :: Maybe Text -> Maybe PageNumber
+  go mp = readIntegral . unpack =<< mp

@@ -27,13 +27,13 @@ instance Yesod App
 
 getSimpleR :: ItemsCount -> PerPage -> Natural -> Handler Html
 getSimpleR total per elements = do
-    pages <- paginate per $ genericReplicate total ()
-    defaultLayout [whamlet|^{simple elements pages}|]
+  pages <- paginate per $ genericReplicate total ()
+  defaultLayout [whamlet|^{simple elements pages}|]
 
 getEllipsedR :: ItemsCount -> PerPage -> Natural -> Handler Html
 getEllipsedR total per elements = do
-    pages <- paginate per $ genericReplicate total ()
-    defaultLayout [whamlet|^{ellipsed elements pages}|]
+  pages <- paginate per $ genericReplicate total ()
+  defaultLayout [whamlet|^{ellipsed elements pages}|]
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)
