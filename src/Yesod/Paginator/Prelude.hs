@@ -18,7 +18,6 @@ import Numeric.Natural as X
 import Safe as X
 
 import Data.Function (on)
-import Text.Blaze
 import Web.PathPieces
 
 instance PathPiece Natural where
@@ -27,10 +26,6 @@ instance PathPiece Natural where
         n <- fromPathPiece @Int p
         guard $ n >= 0
         pure $ fromIntegral n
-
-instance ToMarkup Natural where
-    toMarkup = toMarkup @Int . fromIntegral
-
 
 tshow :: Show a => a -> Text
 tshow = pack . show
