@@ -23,6 +23,7 @@ module Yesod.Paginator.Pages
     -- * Pages
     , Pages
     , pagesCurrent
+    , pagesLast
     , toPages
 
     -- * Safely accessing Pages data
@@ -64,12 +65,13 @@ data Pages a = Pages
     { pagesCurrent :: Page a
     , pagesPrevious :: [PageNumber]
     , pagesNext :: [PageNumber]
+    , pagesLast :: PageNumber
     }
     deriving (Eq, Show)
 
 -- | Take previous pages, going back from current
 --
--- >>> takePreviousPages 3 $ Pages (Page [] 5) [1,2,3,4] [6]
+-- >>> takePreviousPages 3 $ Pages (Page [] 5) [1,2,3,4] [6] 6
 -- [2,3,4]
 --
 takePreviousPages :: Natural -> Pages a -> [PageNumber]
@@ -77,7 +79,7 @@ takePreviousPages n = reverse . take (fromIntegral n) . reverse . pagesPrevious
 
 -- | Take next pages, going forward from current
 --
--- >>> takeNextPages 3 $ Pages (Page [] 2) [1] [3,4,5,6]
+-- >>> takeNextPages 3 $ Pages (Page [] 2) [1] [3,4,5,6] 6
 -- [3,4,5]
 --
 takeNextPages :: Natural -> Pages a -> [PageNumber]
@@ -85,10 +87,10 @@ takeNextPages n = take (fromIntegral n) . pagesNext
 
 -- | The previous page number, if it exists
 --
--- >>> getPreviousPage $ Pages (Page [] 1) [] [2,3,4]
+-- >>> getPreviousPage $ Pages (Page [] 1) [] [2,3,4] 4
 -- Nothing
 --
--- >>> getPreviousPage $ Pages (Page [] 2) [1] [3,4]
+-- >>> getPreviousPage $ Pages (Page [] 2) [1] [3,4] 4
 -- Just 1
 --
 getPreviousPage :: Pages a -> Maybe PageNumber
@@ -99,10 +101,10 @@ getPreviousPage pages = do
 
 -- | The next page number, if it exists
 --
--- >>> getNextPage $ Pages (Page [] 4) [1,2,3] []
+-- >>> getNextPage $ Pages (Page [] 4) [1,2,3] [] 4
 -- Nothing
 --
--- >>> getNextPage $ Pages (Page [] 3) [1,2] [4]
+-- >>> getNextPage $ Pages (Page [] 3) [1,2] [4] 4
 -- Just 4
 --
 getNextPage :: Pages a -> Maybe PageNumber
@@ -114,13 +116,14 @@ getNextPage pages = do
 -- | Construct a @'Pages' a@ from paginated data
 --
 -- >>> toPages 4 3 10 []
--- Pages {pagesCurrent = Page {pageItems = [], pageNumber = 4}, pagesPrevious = [1,2,3], pagesNext = []}
+-- Pages {pagesCurrent = Page {pageItems = [], pageNumber = 4}, pagesPrevious = [1,2,3], pagesNext = [], pagesLast = 4}
 --
 toPages :: PageNumber -> PerPage -> ItemsCount -> [a] -> Pages a
 toPages number per total items = Pages
     { pagesCurrent = toPage items number
     , pagesPrevious = [1 .. (number - 1)]
     , pagesNext = [(number + 1) .. lastPage]
+    , pagesLast = lastPage
     }
     where lastPage = getLastPage total per
 

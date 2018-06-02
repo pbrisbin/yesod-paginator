@@ -31,7 +31,8 @@ instance Yesod App where
                     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
                     ^{pageHead pc}
                 <body>
-                    ^{pageBody pc}
+                    <div .container>
+                        ^{pageBody pc}
             |]
 
 getRootR :: Handler Html
@@ -43,14 +44,19 @@ getRootR = do
     defaultLayout $ do
         setTitle "My title"
         [whamlet|$newline never
-            <h1>Pagination
-            <p>The things:
+            <h1>Pagination Examples
+            <h2>The things:
             <ul>
                 $forall thing <- pageItems $ pagesCurrent pages
                     <li>Thing #{show thing}
 
+            <h2>Simple navigation
             <div .pagination>
                 ^{simple 10 pages}
+
+            <h2>Ellipsed navigation
+            <div .pagination>
+                ^{ellipsed 10 pages}
             |]
 
 main :: IO ()

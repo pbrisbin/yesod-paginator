@@ -55,6 +55,7 @@ module Yesod.Paginator
 
     -- * Widgets
     , simple
+    , ellipsed
     )
 where
 

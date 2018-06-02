@@ -4,6 +4,7 @@
 module Yesod.Paginator.Widgets
     ( PaginationWidget
     , simple
+    , ellipsed
     )
 where
 
@@ -46,42 +47,29 @@ type PaginationWidget m a = Pages a -> WidgetT m IO ()
 --
 simple :: Natural -> PaginationWidget m a
 simple elements pages = do
-    params <- handlerToWidget $ reqGetParams <$> getRequest
+    updateGetParams <- getUpdateGetParams
 
-    let updateGetParams :: PageNumber -> [(Text, Text)]
-        updateGetParams number = nubOn fst $ [("p", tshow number)] <> params
-
-        (prevPages, nextPages) = getBalancedPages elements pages
-
+    let (prevPages, nextPages) = getBalancedPages elements pages
         mPrevPage = getPreviousPage pages
         mNextPage = getNextPage pages
 
     [whamlet|$newline never
         <ul .pagination>
-            $# Move previous, disabled if on first page
             $maybe prevPage <- mPrevPage
                 <li .prev>
                     <a href=#{renderGetParams $ updateGetParams prevPage}>«
             $nothing
                 <li .prev .disabled>
                     <a>«
-
-            $# Previous pages
             $forall number <- prevPages
                 <li .prev >
                     <a href=#{renderGetParams $ updateGetParams number}>#{number}
-
-            $# Current page
             $with number <- pageNumber $ pagesCurrent pages
                 <li .active .disabled>
                     <a>#{number}
-
-            $# Next pages
             $forall number <- nextPages
                 <li .next>
                     <a href=#{renderGetParams $ updateGetParams number}>#{number}
-
-            $# Move next, disabled if on last page
             $maybe nextPage <- mNextPage
                 <li .next>
                     <a href=#{renderGetParams $ updateGetParams nextPage}>»
@@ -90,6 +78,77 @@ simple elements pages = do
                     <a>»
         |]
 
+-- | Show pages before and after, ellipsis, and first/last
+ellipsed :: Natural -> PaginationWidget m a
+ellipsed elements pages = do
+    updateGetParams <- getUpdateGetParams
+
+    let (prevPages, nextPages) = getBalancedPages elements pages
+
+        mPrevPage = getPreviousPage pages
+        mNextPage = getNextPage pages
+
+        (mFirstPage, firstEllipses)
+            | pageNumber (pagesCurrent pages) == 1 = (Nothing, False)
+            | headMay prevPages == Just 1 = (Nothing, False)
+            | headMay prevPages == Just 2 = (Just 1, False)
+            | otherwise = (Just 1, True)
+
+        (mLastPage, lastEllipses)
+            | pageNumber (pagesCurrent pages) == pagesLast pages = (Nothing, False)
+            | lastMay nextPages == Just (pagesLast pages) = (Nothing, False)
+            | lastMay nextPages == Just (pagesLast pages - 1) = (Just $ pagesLast pages, False)
+            | otherwise = (Just $ pagesLast pages, True)
+
+    [whamlet|$newline never
+        <ul .pagination>
+            $maybe prevPage <- mPrevPage
+                <li .prev>
+                    <a href=#{renderGetParams $ updateGetParams prevPage}>«
+            $nothing
+                <li .prev .disabled>
+                    <a>«
+            $maybe firstPage <- mFirstPage
+                <li .prev>
+                    <a href=#{renderGetParams $ updateGetParams firstPage}>#{firstPage}
+                $if firstEllipses
+                    <li .prev .disabled>
+                        <a>…
+            $forall number <- prevPages
+                <li .prev >
+                    <a href=#{renderGetParams $ updateGetParams number}>#{number}
+            $with number <- pageNumber $ pagesCurrent pages
+                <li .active .disabled>
+                    <a>#{number}
+            $forall number <- nextPages
+                <li .next>
+                    <a href=#{renderGetParams $ updateGetParams number}>#{number}
+            $maybe lastPage <- mLastPage
+                $if lastEllipses
+                    <li .next .disabled>
+                        <a>…
+                <li .next>
+                    <a href=#{renderGetParams $ updateGetParams lastPage}>#{lastPage}
+            $maybe nextPage <- mNextPage
+                <li .next>
+                    <a href=#{renderGetParams $ updateGetParams nextPage}>»
+            $nothing
+                <li .next .disabled>
+                    <a>»
+        |]
+
+-- | Calculate previous and next pages to produce an overall number of elements
+--
+-- >>> let page n = toPages n 2 20 [] :: Pages Int
+-- >>> getBalancedPages 6 $ page 1
+-- ([],[2,3,4,5,6])
+--
+-- >>> getBalancedPages 6 $ page 6
+-- ([3,4,5],[7,8])
+--
+-- >>> getBalancedPages 6 $ page 10
+-- ([5,6,7,8,9],[])
+--
 getBalancedPages :: Natural -> Pages a -> ([PageNumber], [PageNumber])
 getBalancedPages elements pages =
     if genericLength nextPages >= (elements `div` 2)
@@ -99,6 +158,11 @@ getBalancedPages elements pages =
     nextPages = takeNextPages (elements - genericLength prevPagesNaive - 1) pages
     prevPagesNaive = takePreviousPages (elements `div` 2) pages
     prevPagesCalcd = takePreviousPages (elements - genericLength nextPages - 1) pages
+
+getUpdateGetParams :: WidgetT m IO (PageNumber -> [(Text, Text)])
+getUpdateGetParams = do
+    params <- handlerToWidget $ reqGetParams <$> getRequest
+    pure $ \number -> nubOn fst $ [("p", tshow number)] <> params
 
 renderGetParams :: [(Text, Text)] -> Text
 renderGetParams [] = ""

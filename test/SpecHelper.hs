@@ -19,7 +19,8 @@ import Yesod.Test as X
 data App = App
 
 mkYesod "App" [parseRoutes|
-    /#ItemsCount/#PerPage/#Natural SimpleR GET
+    /simple/#ItemsCount/#PerPage/#Natural SimpleR GET
+    /ellipsed/#ItemsCount/#PerPage/#Natural EllipsedR GET
 |]
 
 instance Yesod App
@@ -28,6 +29,11 @@ getSimpleR :: ItemsCount -> PerPage -> Natural -> Handler Html
 getSimpleR total per elements = do
     pages <- paginate per $ genericReplicate total ()
     defaultLayout [whamlet|^{simple elements pages}|]
+
+getEllipsedR :: ItemsCount -> PerPage -> Natural -> Handler Html
+getEllipsedR total per elements = do
+    pages <- paginate per $ genericReplicate total ()
+    defaultLayout [whamlet|^{ellipsed elements pages}|]
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)

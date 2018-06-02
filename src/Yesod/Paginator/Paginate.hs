@@ -27,19 +27,19 @@ paginate per items = paginate' per items <$> getCurrentPage
 -- This can be used to avoid the monadic context altogether.
 --
 -- >>> paginate' 3 ([1..10] :: [Int]) 1
--- Pages {pagesCurrent = Page {pageItems = [1,2,3], pageNumber = 1}, pagesPrevious = [], pagesNext = [2,3,4]}
+-- Pages {pagesCurrent = Page {pageItems = [1,2,3], pageNumber = 1}, pagesPrevious = [], pagesNext = [2,3,4], pagesLast = 4}
 --
 -- >>> paginate' 3 ([1..10] :: [Int]) 2
--- Pages {pagesCurrent = Page {pageItems = [4,5,6], pageNumber = 2}, pagesPrevious = [1], pagesNext = [3,4]}
+-- Pages {pagesCurrent = Page {pageItems = [4,5,6], pageNumber = 2}, pagesPrevious = [1], pagesNext = [3,4], pagesLast = 4}
 --
 -- >>> paginate' 3 ([1..10] :: [Int]) 3
--- Pages {pagesCurrent = Page {pageItems = [7,8,9], pageNumber = 3}, pagesPrevious = [1,2], pagesNext = [4]}
+-- Pages {pagesCurrent = Page {pageItems = [7,8,9], pageNumber = 3}, pagesPrevious = [1,2], pagesNext = [4], pagesLast = 4}
 --
 -- >>> paginate' 3 ([1..10] :: [Int]) 4
--- Pages {pagesCurrent = Page {pageItems = [10], pageNumber = 4}, pagesPrevious = [1,2,3], pagesNext = []}
+-- Pages {pagesCurrent = Page {pageItems = [10], pageNumber = 4}, pagesPrevious = [1,2,3], pagesNext = [], pagesLast = 4}
 --
 -- >>> paginate' 3 ([1..10] :: [Int]) 5
--- Pages {pagesCurrent = Page {pageItems = [], pageNumber = 5}, pagesPrevious = [1,2,3,4], pagesNext = []}
+-- Pages {pagesCurrent = Page {pageItems = [], pageNumber = 5}, pagesPrevious = [1,2,3,4], pagesNext = [], pagesLast = 4}
 --
 paginate' :: PerPage -> [a] -> PageNumber -> Pages a
 paginate' per items p =
