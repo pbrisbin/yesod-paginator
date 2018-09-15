@@ -34,6 +34,23 @@
 --             |]
 -- @
 --
+-- For backends other than persitent @'selectCustom'@ can be used
+--
+-- @
+-- getSomeRoute something = do
+--     (totCnt, pages) <- runDB $ 'selectCustom' 10
+--                  someCntQuery
+--                  (\pn -> someOffsetQuery $ 10 * (fromIntegral pn - 1))
+--
+--     defaultLayout $ do
+--         [whamlet|
+--             $forall thing <- 'pageItems' $ 'pagesCurrent' pages
+--                 ^{showThing $ entityVal thing}
+--
+--             ^{'simple' 5 pages}
+--             |]
+-- @
+
 module Yesod.Paginator
     (
     -- * Type-safe numerics
@@ -52,6 +69,7 @@ module Yesod.Paginator
     -- * Paginators
     , paginate
     , selectPaginated
+    , paginateCustom
 
     -- * Widgets
     , simple
