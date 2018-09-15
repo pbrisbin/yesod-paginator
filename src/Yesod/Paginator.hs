@@ -34,12 +34,12 @@
 --             |]
 -- @
 --
--- For backends other than persitent @'selectCustom'@ can be used 
+-- For backends other than persitent @'selectCustom'@ can be used
 --
 -- @
 -- getSomeRoute something = do
---     (totCnt, pages) <- runDB $ 'selectCustom' 10 
---                  someCntQuery 
+--     (totCnt, pages) <- runDB $ 'selectCustom' 10
+--                  someCntQuery
 --                  (\pn -> someOffsetQuery $ 10 * (fromIntegral pn - 1))
 --
 --     defaultLayout $ do
