@@ -63,7 +63,7 @@ paginateCustom per getcount getitems = do
     cnt <- getcount
     p <- lift getCurrentPage
     pitems <- getitems p
-    pure $ (cnt, toPages p per cnt pitems)
+    pure (cnt, toPages p per cnt pitems)
 
 
 -- | Paginate out of a persistent database

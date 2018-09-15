@@ -61,6 +61,7 @@ module Yesod.Paginator
     -- * Paginated data
     , Pages
     , pagesCurrent
+    , pageOffset
 
     -- * The current page
     , Page
