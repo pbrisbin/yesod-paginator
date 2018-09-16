@@ -7,6 +7,7 @@ module Yesod.Paginator.Paginate
     , paginate'
     , selectPaginated
     , selectPaginated'
+    , getCurrentPage
     )
 where
 
