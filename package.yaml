@@ -26,7 +26,6 @@ library:
     - transformers
     - uri-encode
     - yesod-core >=1.4
-    - yesod-persistent >= 1.4
   default-extensions:
     - NoImplicitPrelude
 

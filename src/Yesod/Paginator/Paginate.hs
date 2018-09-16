@@ -16,10 +16,9 @@ import Control.Monad.Trans.Reader (ReaderT)
 import Database.Persist
 import Yesod.Core
 import Yesod.Paginator.Pages
-import Yesod.Persist.Core
 
 -- | Paginate a list of items
-paginate :: Yesod site => PerPage -> [a] -> HandlerFor site (Pages a)
+paginate :: MonadHandler m => PerPage -> [a] -> m (Pages a)
 paginate per items = paginate' per items <$> getCurrentPage
 
 -- | A version where the current page is given
@@ -49,21 +48,21 @@ paginate' per items p =
 
 -- | Paginate out of a persistent database
 selectPaginated
-    :: ( PersistEntity val
-       , PersistEntityBackend val ~ BaseBackend (YesodPersistBackend site)
-       , PersistQuery (YesodPersistBackend site)
-       , Yesod site
+    :: ( MonadHandler m
+       , PersistEntity record
+       , PersistEntityBackend record ~ BaseBackend backend
+       , PersistQueryRead backend
        )
     => PerPage
-    -> [Filter val]
-    -> [SelectOpt val]
-    -> YesodDB site (Pages (Entity val))
+    -> [Filter record]
+    -> [SelectOpt record]
+    -> ReaderT backend m (Pages (Entity record))
 selectPaginated per filters options =
     selectPaginated' per filters options =<< lift getCurrentPage
 
 -- | A version where the current page is given
 --
--- This can be used to avoid the Yesod context
+-- This can be used to avoid the @'MonadHandler'@ context.
 --
 selectPaginated'
     :: ( MonadIO m
