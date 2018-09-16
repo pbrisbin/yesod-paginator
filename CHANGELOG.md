@@ -1,4 +1,13 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v0.11.0...master)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.1...master)
+
+None
+
+## [v1.1.0.1](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.0...v1.1.0.1)
+
+- Export `getCurrentPage`
+- Simplify some constraints with `MonadHandler`
+
+## [v1.1.0.0](https://github.com/pbrisbin/yesod-paginator/compare/v0.11.0...v1.1.0.0)
 
 - Major rewrite
 
