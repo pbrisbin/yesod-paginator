@@ -57,6 +57,21 @@ data Page a = Page
     }
     deriving (Eq, Show)
 
+setPageItems :: Page a -> [b] -> Page b
+setPageItems page items = page { pageItems = items }
+
+overPageItems :: ([a] -> [b]) -> Page a -> Page b
+overPageItems f page = setPageItems page $ f $ pageItems page
+
+instance Functor Page where
+    fmap f = overPageItems $ fmap f
+
+instance Foldable Page where
+    foldMap f = foldMap f . pageItems
+
+instance Traversable Page where
+    traverse f page = setPageItems page <$> traverse f (pageItems page)
+
 -- | @'Page'@ constructor
 toPage :: [a] -> PageNumber -> Page a
 toPage = Page
@@ -68,6 +83,21 @@ data Pages a = Pages
     , pagesLast :: PageNumber
     }
     deriving (Eq, Show)
+
+setPagesCurrent :: Pages a -> Page b -> Pages b
+setPagesCurrent pages current = pages { pagesCurrent = current }
+
+overPagesCurrent :: (Page a -> Page b) -> Pages a -> Pages b
+overPagesCurrent f pages = setPagesCurrent pages $ f $ pagesCurrent pages
+
+instance Functor Pages where
+    fmap f = overPagesCurrent $ fmap f
+
+instance Foldable Pages where
+    foldMap f = foldMap f . pagesCurrent
+
+instance Traversable Pages where
+    traverse f pages = setPagesCurrent pages <$> traverse f (pagesCurrent pages)
 
 -- | Take previous pages, going back from current
 --
