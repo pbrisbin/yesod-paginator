@@ -46,9 +46,11 @@ tests:
     main: Spec.hs
     source-dirs: test
     dependencies:
+      - QuickCheck
       - hspec
-      - yesod-paginator
+      - quickcheck-classes
       - yesod-core
+      - yesod-paginator
       - yesod-test
   doctests:
     main: Main.hs
