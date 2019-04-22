@@ -1,6 +1,30 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.1...master)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.2...master)
 
 None
+
+## [v1.1.0.2](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.0...v1.1.0.2)
+
+- `Functor`, `Foldable`, and `Traversable` instances for `Pages`
+
+  And so necessarily, `Page`.
+
+  These work by applying the functions to a `Pages`' current `Page`, which is to
+  apply it to each of the `Page`'s items. These can be used to extend the data
+  post-pagination; purely via `fmap`, or with effect using `traverse`.
+
+  ```hs
+  pages <- runDB $ do
+    users <- selectPaginated 10 [UserFoo ==. foo] []
+
+    -- for :: Pages User -> (User -> t UserWithPosts) -> t (Pages UserWithPosts)
+
+    for users $ \user -> do
+      posts <- selectList [PostUserId ==. user] [Desc PostCreatedAt, LimitTo 5]
+      pure $ UserWithPosts user posts
+  ```
+
+  Yes, this does encourage `N+1` queries, but the idea is they will not be
+  harmful when `N` is small due to pagination.
 
 ## [v1.1.0.1](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.0...v1.1.0.1)
 
