@@ -1,13 +1,20 @@
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module Yesod.Paginator.Paginate
     ( paginate
     , paginate'
+    , paginateWith
     , selectPaginated
     , selectPaginated'
+    , selectPaginatedWith
     , getCurrentPage
+    , PaginationConfig(..)
+    , PageParamName(..)
+    , defaultPaginationConfig
     )
 where
 
@@ -18,9 +25,21 @@ import Database.Persist
 import Yesod.Core
 import Yesod.Paginator.Pages
 
+defaultPaginationConfig :: PaginationConfig
+defaultPaginationConfig = PaginationConfig
+    { paginationConfigPageParamName = PageParamName "p"
+    , paginationConfigPerPage = 3
+    }
+
 -- | Paginate a list of items
 paginate :: MonadHandler m => PerPage -> [a] -> m (Pages a)
-paginate per items = paginate' per items <$> getCurrentPage
+paginate per =
+    paginateWith defaultPaginationConfig { paginationConfigPerPage = per }
+
+-- | Paginate a list of items given a pagination config
+paginateWith :: MonadHandler m => PaginationConfig -> [a] -> m (Pages a)
+paginateWith config items = paginate' (paginationConfigPerPage config) items
+    <$> (getCurrentPageWith . paginationConfigPageParamName) config
 
 -- | A version where the current page is given
 --
@@ -58,8 +77,24 @@ selectPaginated
     -> [Filter record]
     -> [SelectOpt record]
     -> ReaderT backend m (Pages (Entity record))
-selectPaginated per filters options =
-    selectPaginated' per filters options =<< lift getCurrentPage
+selectPaginated per = selectPaginatedWith defaultPaginationConfig
+    { paginationConfigPerPage = per
+    }
+
+-- | Paginate out of a persistent database given a pagination config
+selectPaginatedWith
+    :: ( MonadHandler m
+       , PersistEntity record
+       , PersistEntityBackend record ~ BaseBackend backend
+       , PersistQueryRead backend
+       )
+    => PaginationConfig
+    -> [Filter record]
+    -> [SelectOpt record]
+    -> ReaderT backend m (Pages (Entity record))
+selectPaginatedWith config filters options =
+    selectPaginated' (paginationConfigPerPage config) filters options
+        =<< lift ((getCurrentPageWith . paginationConfigPageParamName) config)
 
 -- | A version where the current page is given
 --
@@ -86,7 +121,21 @@ selectPaginated' per filters options p =
         )
 
 getCurrentPage :: MonadHandler m => m PageNumber
-getCurrentPage = fromMaybe 1 . go <$> lookupGetParam "p"
+getCurrentPage = 
+  getCurrentPageWith (paginationConfigPageParamName defaultPaginationConfig)
+
+getCurrentPageWith :: MonadHandler m => PageParamName -> m PageNumber
+getCurrentPageWith pageParamName = fromMaybe 1 . go <$> lookupGetParam 
+  (unPageParamName pageParamName)
   where
     go :: Maybe Text -> Maybe PageNumber
     go mp = readIntegral . unpack =<< mp
+
+newtype PageParamName = PageParamName { unPageParamName :: Text }
+    deriving (Eq)
+    deriving newtype (Read, Show, PathPiece)
+
+data PaginationConfig = PaginationConfig
+  { paginationConfigPageParamName :: PageParamName
+  , paginationConfigPerPage :: PerPage
+  }
