@@ -38,7 +38,7 @@ getEllipsedR total per elements = do
     defaultLayout [whamlet|^{ellipsed elements pages}|]
 
 getSimpleParamNameR
-  :: ItemsCount -> PerPage -> Natural -> PageParamName -> Handler Html
+    :: ItemsCount -> PerPage -> Natural -> PageParamName -> Handler Html
 getSimpleParamNameR total per elements pageParamName = do
     let
         config = PaginationConfig
@@ -49,7 +49,7 @@ getSimpleParamNameR total per elements pageParamName = do
     defaultLayout [whamlet|^{simpleWith config elements pages}|]
 
 getEllipsedParamNameR
-  :: ItemsCount -> PerPage -> Natural -> PageParamName -> Handler Html
+    :: ItemsCount -> PerPage -> Natural -> PageParamName -> Handler Html
 getEllipsedParamNameR total per elements pageParamName = do
     let
         config = PaginationConfig
