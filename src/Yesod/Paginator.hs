@@ -57,7 +57,9 @@ module Yesod.Paginator
 
     -- * Widgets
     , simple
+    , simpleWith
     , ellipsed
+    , ellipsedWith
 
     -- * Pagination configuration
     , PaginationConfig(..)
