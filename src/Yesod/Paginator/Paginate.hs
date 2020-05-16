@@ -121,11 +121,11 @@ selectPaginated' per filters options p =
         )
 
 getCurrentPage :: MonadHandler m => m PageNumber
-getCurrentPage = 
+getCurrentPage =
   getCurrentPageWith (paginationConfigPageParamName defaultPaginationConfig)
 
 getCurrentPageWith :: MonadHandler m => PageParamName -> m PageNumber
-getCurrentPageWith pageParamName = fromMaybe 1 . go <$> lookupGetParam 
+getCurrentPageWith pageParamName = fromMaybe 1 . go <$> lookupGetParam
   (unPageParamName pageParamName)
   where
     go :: Maybe Text -> Maybe PageNumber
