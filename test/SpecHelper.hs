@@ -21,6 +21,8 @@ data App = App
 mkYesod "App" [parseRoutes|
     /simple/#ItemsCount/#PerPage/#Natural SimpleR GET
     /ellipsed/#ItemsCount/#PerPage/#Natural EllipsedR GET
+    /simple-param-name/#ItemsCount/#PerPage/#Natural/#PageParamName SimpleParamNameR GET
+    /ellipsed-param-name/#ItemsCount/#PerPage/#Natural/#PageParamName EllipsedParamNameR GET
 |]
 
 instance Yesod App
@@ -34,6 +36,28 @@ getEllipsedR :: ItemsCount -> PerPage -> Natural -> Handler Html
 getEllipsedR total per elements = do
     pages <- paginate per $ genericReplicate total ()
     defaultLayout [whamlet|^{ellipsed elements pages}|]
+
+getSimpleParamNameR
+  :: ItemsCount -> PerPage -> Natural -> PageParamName -> Handler Html
+getSimpleParamNameR total per elements pageParamName = do
+    let
+        config = PaginationConfig
+            { paginationConfigPerPage = per
+            , paginationConfigPageParamName = pageParamName
+            }
+    pages <- paginateWith config $ genericReplicate total ()
+    defaultLayout [whamlet|^{simpleWith config elements pages}|]
+
+getEllipsedParamNameR
+  :: ItemsCount -> PerPage -> Natural -> PageParamName -> Handler Html
+getEllipsedParamNameR total per elements pageParamName = do
+    let
+        config = PaginationConfig
+            { paginationConfigPerPage = per
+            , paginationConfigPageParamName = pageParamName
+            }
+    pages <- paginateWith config $ genericReplicate total ()
+    defaultLayout [whamlet|^{ellipsedWith config elements pages}|]
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)
