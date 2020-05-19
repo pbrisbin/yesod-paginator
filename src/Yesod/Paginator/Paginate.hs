@@ -1,7 +1,4 @@
-{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module Yesod.Paginator.Paginate
@@ -24,12 +21,7 @@ import Control.Monad.Trans.Reader (ReaderT)
 import Database.Persist
 import Yesod.Core
 import Yesod.Paginator.Pages
-
-defaultPaginationConfig :: PaginationConfig
-defaultPaginationConfig = PaginationConfig
-    { paginationConfigPageParamName = PageParamName "p"
-    , paginationConfigPerPage = 3
-    }
+import Yesod.Paginator.PaginationConfig
 
 -- | Paginate a list of items
 paginate :: MonadHandler m => PerPage -> [a] -> m (Pages a)
@@ -130,12 +122,3 @@ getCurrentPageWith pageParamName = fromMaybe 1 . go <$> lookupGetParam
   where
     go :: Maybe Text -> Maybe PageNumber
     go mp = readIntegral . unpack =<< mp
-
-newtype PageParamName = PageParamName { unPageParamName :: Text }
-    deriving (Eq)
-    deriving newtype (Read, Show, PathPiece)
-
-data PaginationConfig = PaginationConfig
-  { paginationConfigPageParamName :: PageParamName
-  , paginationConfigPerPage :: PerPage
-  }
