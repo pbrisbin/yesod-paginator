@@ -4,7 +4,9 @@
 module Yesod.Paginator.Widgets
     ( PaginationWidget
     , simple
+    , simpleWith
     , ellipsed
+    , ellipsedWith
     )
 where
 
@@ -14,6 +16,7 @@ import qualified Data.Text as T
 import Network.URI.Encode (encodeText)
 import Yesod.Core
 import Yesod.Paginator.Pages
+import Yesod.Paginator.Paginate
 
 type PaginationWidget site a = Pages a -> WidgetFor site ()
 
@@ -46,8 +49,11 @@ type PaginationWidget site a = Pages a -> WidgetFor site ()
 -- @
 --
 simple :: Natural -> PaginationWidget m a
-simple elements pages = do
-    updateGetParams <- getUpdateGetParams
+simple = simpleWith defaultPaginationConfig
+
+simpleWith :: PaginationConfig -> Natural -> PaginationWidget m a
+simpleWith config elements pages = do
+    updateGetParams <- getUpdateGetParams (paginationConfigPageParamName config)
 
     let (prevPages, nextPages) = getBalancedPages elements pages
         mPrevPage = getPreviousPage pages
@@ -80,8 +86,11 @@ simple elements pages = do
 
 -- | Show pages before and after, ellipsis, and first/last
 ellipsed :: Natural -> PaginationWidget m a
-ellipsed elements pages = do
-    updateGetParams <- getUpdateGetParams
+ellipsed = ellipsedWith defaultPaginationConfig
+
+ellipsedWith :: PaginationConfig -> Natural -> PaginationWidget m a
+ellipsedWith config elements pages = do
+    updateGetParams <- getUpdateGetParams (paginationConfigPageParamName config)
 
     let (prevPages, nextPages) = getBalancedPages elements pages
 
@@ -159,10 +168,10 @@ getBalancedPages elements pages =
     prevPagesNaive = takePreviousPages (elements `div` 2) pages
     prevPagesCalcd = takePreviousPages (elements - genericLength nextPages - 1) pages
 
-getUpdateGetParams :: WidgetFor site (PageNumber -> [(Text, Text)])
-getUpdateGetParams = do
+getUpdateGetParams :: PageParamName -> WidgetFor site (PageNumber -> [(Text, Text)])
+getUpdateGetParams pageParamName = do
     params <- handlerToWidget $ reqGetParams <$> getRequest
-    pure $ \number -> nubOn fst $ [("p", tshow number)] <> params
+    pure $ \number -> nubOn fst $ [(unPageParamName pageParamName, tshow number)] <> params
 
 renderGetParams :: [(Text, Text)] -> Text
 renderGetParams [] = ""

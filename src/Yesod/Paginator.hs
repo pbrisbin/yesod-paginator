@@ -51,11 +51,19 @@ module Yesod.Paginator
 
     -- * Paginators
     , paginate
+    , paginateWith
     , selectPaginated
+    , selectPaginatedWith
 
     -- * Widgets
     , simple
+    , simpleWith
     , ellipsed
+    , ellipsedWith
+
+    -- * Pagination configuration
+    , PaginationConfig(..)
+    , PageParamName(..)
     )
 where
 
