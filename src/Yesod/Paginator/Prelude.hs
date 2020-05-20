@@ -12,7 +12,6 @@ import Prelude as X
 import Control.Monad as X
 import Data.List as X
 import Data.Maybe as X
-import Data.Semigroup as X ((<>))
 import Data.Text as X (Text, pack, unpack)
 import Numeric.Natural as X
 import Safe as X

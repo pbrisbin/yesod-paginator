@@ -1,5 +1,4 @@
----
-resolver: lts-13.17
-extra-deps:
-  - quickcheck-classes-0.6.1.0@sha256:a8d0782eb2c67b6606eb4ff581f5813522b5b2e2ee91a9c2ae65bfc7d45b6327
-  - semirings-0.3.1.2@sha256:ecb57a0ba210409f1376646b3cfd1f48a756ad8ab8467fce98d50e2e15e1c528
+resolver: lts-15.12
+
+# Fix weeder with stack-2.0
+ghc-options: { "$locals": -ddump-to-file -ddump-hi }
