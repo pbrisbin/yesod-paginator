@@ -1,6 +1,11 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.2...master)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.1.0...master)
 
 None
+
+## [v1.1.1.0](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.2...v1.1.1.0)
+
+- Add `PaginationConfig` and various `*With`-flavored functions for customizing
+  things like per-page size and `GET` parameter naming [@eahlberg](https://github.com/pbrisbin/yesod-paginator/pull/33)
 
 ## [v1.1.0.2](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.0...v1.1.0.2)
 
