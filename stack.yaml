@@ -1,4 +1,18 @@
-resolver: lts-15.12
+resolver: lts-15.18
 
-# Fix weeder with stack-2.0
-ghc-options: { "$locals": -ddump-to-file -ddump-hi }
+extra-deps:
+  # for weeder
+  - dhall-1.40.2@sha256:db1d5f81912de498eeb8cf4535aebd76c695c016a8c5710970b61e83f3d345cb,34786
+  - generic-lens-2.2.0.0@sha256:4008a39f464e377130346e46062e2ac1211f9d2e256bbb1857216e889c7196be,3867
+  - generic-lens-core-2.2.0.0@sha256:b6b69e992f15fa80001de737f41f2123059011a1163d6c8941ce2e3ab44f8c03,2913
+
+ghc-options:
+  "$locals": >
+    -fwrite-ide-info
+    -Weverything
+    -Wno-safe
+    -Wno-unsafe
+    -Wno-missing-import-lists
+    -Wno-missing-safe-haskell-mode
+    -Wno-prepositive-qualified-module
+    -Wno-all-missed-specialisations
