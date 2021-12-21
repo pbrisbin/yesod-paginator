@@ -3,10 +3,31 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: dhall-1.40.2@sha256:db1d5f81912de498eeb8cf4535aebd76c695c016a8c5710970b61e83f3d345cb,34786
+    pantry-tree:
+      size: 316011
+      sha256: 4f87e4e4a327a9bffacd130a3efee3a5eb3a49d3ec85ade58eecd6c3d9608b63
+  original:
+    hackage: dhall-1.40.2@sha256:db1d5f81912de498eeb8cf4535aebd76c695c016a8c5710970b61e83f3d345cb,34786
+- completed:
+    hackage: generic-lens-2.2.0.0@sha256:4008a39f464e377130346e46062e2ac1211f9d2e256bbb1857216e889c7196be,3867
+    pantry-tree:
+      size: 2470
+      sha256: 93d7aae1de4cbbb2e3320b357cd744618cb17356989bd417d374aa73331e7370
+  original:
+    hackage: generic-lens-2.2.0.0@sha256:4008a39f464e377130346e46062e2ac1211f9d2e256bbb1857216e889c7196be,3867
+- completed:
+    hackage: generic-lens-core-2.2.0.0@sha256:b6b69e992f15fa80001de737f41f2123059011a1163d6c8941ce2e3ab44f8c03,2913
+    pantry-tree:
+      size: 2202
+      sha256: 6918fb47f34ecf4246778b229911693b6e20fc2ce94ae8c89d69a89db4e72269
+  original:
+    hackage: generic-lens-core-2.2.0.0@sha256:b6b69e992f15fa80001de737f41f2123059011a1163d6c8941ce2e3ab44f8c03,2913
 snapshots:
 - completed:
-    size: 494635
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/12.yaml
-    sha256: a71c4293d8f461f455ff0d9815dfe4ab2f1adacd7e0bbc9a218f46ced8c4929a
-  original: lts-15.12
+    size: 586296
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/18.yaml
+    sha256: 63539429076b7ebbab6daa7656cfb079393bf644971156dc349d7c0453694ac2
+  original: lts-18.18
