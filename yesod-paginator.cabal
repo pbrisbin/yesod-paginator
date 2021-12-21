@@ -10,15 +10,11 @@ synopsis:       A pagination approach for yesod
 description:    Paginate a list showing a per-item widget and links to other pages
 category:       Web, Yesod
 homepage:       http://github.com/pbrisbin/yesod-paginator
-author:         Patrick Brisbin
-maintainer:     pbrisbin@gmail.com
-license:        BSD3
+author:         Patrick Brisbin <pbrisbin@gmail.com>
+maintainer:     Patrick Brisbin <pbrisbin@gmail.com>
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
-
-source-repository head
-  type: git
-  location: git://github.com/pbrisbin/yesod-paginator.git
 
 flag examples
   description: Build the examples
@@ -58,6 +54,8 @@ executable yesod-paginator-example
       Paths_yesod_paginator
   hs-source-dirs:
       example
+  default-extensions:
+      NoImplicitPrelude
   ghc-options: -Wall
   build-depends:
       base >4.8.0 && <5
@@ -75,6 +73,8 @@ test-suite doctests
       Paths_yesod_paginator
   hs-source-dirs:
       doctest
+  default-extensions:
+      NoImplicitPrelude
   ghc-options: -Wall
   build-depends:
       base >4.8.0 && <5
@@ -91,6 +91,8 @@ test-suite test
       Paths_yesod_paginator
   hs-source-dirs:
       test
+  default-extensions:
+      NoImplicitPrelude
   ghc-options: -Wall
   build-depends:
       QuickCheck

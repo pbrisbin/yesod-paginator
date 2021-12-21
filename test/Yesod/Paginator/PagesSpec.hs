@@ -3,8 +3,9 @@
 
 module Yesod.Paginator.PagesSpec
     ( spec
-    )
-where
+    ) where
+
+import Prelude
 
 import Data.Foldable (traverse_)
 import Data.Functor.Classes (Eq1(..), Show1(..))
@@ -59,5 +60,8 @@ spec = do
 itPreserves :: Laws -> Spec
 itPreserves Laws {..} = mkContext $ traverse_ (uncurry mkIt) lawsProperties
   where
+    mkContext :: SpecWith a -> SpecWith a
     mkContext = context $ lawsTypeclass <> " laws"
+
+    mkIt :: Example a => String -> a -> SpecWith (Arg a)
     mkIt name = it $ "preserves " <> name

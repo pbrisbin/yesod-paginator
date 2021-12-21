@@ -6,8 +6,7 @@ module Yesod.Paginator.PaginationConfig
     ( PaginationConfig(..)
     , PageParamName(..)
     , defaultPaginationConfig
-    )
-where
+    ) where
 
 import Yesod.Paginator.Prelude
 
@@ -15,13 +14,13 @@ import Yesod.Core
 import Yesod.Paginator.Pages
 
 newtype PageParamName = PageParamName { unPageParamName :: Text }
-    deriving (Eq)
+    deriving stock Eq
     deriving newtype (Read, Show, PathPiece)
 
 data PaginationConfig = PaginationConfig
-  { paginationConfigPageParamName :: PageParamName
-  , paginationConfigPerPage :: PerPage
-  }
+    { paginationConfigPageParamName :: PageParamName
+    , paginationConfigPerPage :: PerPage
+    }
 
 defaultPaginationConfig :: PaginationConfig
 defaultPaginationConfig = PaginationConfig
