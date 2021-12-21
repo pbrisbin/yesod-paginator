@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: freckle/stack-cache-action@v1
+      - uses: freckle/stack-action@v3
+        with:
+          stack-arguments: --flag yesod-paginator:examples
+      - uses: freckle/weeder-action@v1
+        with:
+          weeder-version: 2.2.0
+
+  hlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: rwe/actions-hlint-setup@v1
+      - run: |
+          curl -o .hlint.yaml https://raw.githubusercontent.com/pbrisbin/dotfiles/master/hlint.yaml
+      - uses: rwe/actions-hlint-run@v2
+        with:
+          fail-on: warning
