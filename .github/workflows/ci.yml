@@ -11,12 +11,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: freckle/stack-cache-action@v1
-      - uses: freckle/stack-action@v3
+
+      - id: stack
+        uses: freckle/stack-action@v3
         with:
-          stack-arguments: --flag yesod-paginator:examples
+          stack-arguments: --flag yesod-paginator:examples --coverage
+
       - uses: freckle/weeder-action@v1
         with:
           weeder-version: 2.2.0
+
+      - name: Reformat coverage
+        run: |
+          tix='${{ steps.stack.outputs.local-hpc-root }}/combined/all/all.tix'
+          stack --no-terminal install --copy-compiler-tool hpc-lcov
+          stack --no-terminal exec -- hpc-lcov --file "$tix"
+
+      - uses: codecov/codecov-action@v2
+        with:
+          files: ./lcov.info
 
   hlint:
     runs-on: ubuntu-latest
