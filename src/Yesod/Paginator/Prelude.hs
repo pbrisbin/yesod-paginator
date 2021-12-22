@@ -4,13 +4,13 @@
 module Yesod.Paginator.Prelude
     ( module X
     , module Yesod.Paginator.Prelude
-    )
-where
+    ) where
 
 import Prelude as X
 
 import Control.Monad as X
 import Data.List as X
+    (genericDrop, genericLength, genericReplicate, genericTake, nubBy)
 import Data.Maybe as X
 import Data.Text as X (Text, pack, unpack)
 import Numeric.Natural as X

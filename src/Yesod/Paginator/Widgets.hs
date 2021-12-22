@@ -7,8 +7,7 @@ module Yesod.Paginator.Widgets
     , simpleWith
     , ellipsed
     , ellipsedWith
-    )
-where
+    ) where
 
 import Yesod.Paginator.Prelude
 
@@ -100,14 +99,18 @@ ellipsedWith config elements pages = do
         (mFirstPage, firstEllipses)
             | pageNumber (pagesCurrent pages) == 1 = (Nothing, False)
             | headMay prevPages == Just 1 = (Nothing, False)
-            | headMay prevPages == Just 2 = (Just 1, False)
+            | headMay prevPages == Just 2 = (Just (1 :: PageNumber), False)
             | otherwise = (Just 1, True)
 
         (mLastPage, lastEllipses)
-            | pageNumber (pagesCurrent pages) == pagesLast pages = (Nothing, False)
-            | lastMay nextPages == Just (pagesLast pages) = (Nothing, False)
-            | lastMay nextPages == Just (pagesLast pages - 1) = (Just $ pagesLast pages, False)
-            | otherwise = (Just $ pagesLast pages, True)
+            | pageNumber (pagesCurrent pages) == pagesLast pages
+            = (Nothing, False)
+            | lastMay nextPages == Just (pagesLast pages)
+            = (Nothing, False)
+            | lastMay nextPages == Just (pagesLast pages - 1)
+            = (Just $ pagesLast pages, False)
+            | otherwise
+            = (Just $ pagesLast pages, True)
 
     [whamlet|$newline never
         <ul .pagination>
@@ -164,14 +167,21 @@ getBalancedPages elements pages =
         then (prevPagesNaive, nextPages)
         else (prevPagesCalcd, nextPages)
   where
-    nextPages = takeNextPages (elements - genericLength prevPagesNaive - 1) pages
+    nextPages =
+        takeNextPages (elements - genericLength prevPagesNaive - 1) pages
     prevPagesNaive = takePreviousPages (elements `div` 2) pages
-    prevPagesCalcd = takePreviousPages (elements - genericLength nextPages - 1) pages
+    prevPagesCalcd =
+        takePreviousPages (elements - genericLength nextPages - 1) pages
 
-getUpdateGetParams :: PageParamName -> WidgetFor site (PageNumber -> [(Text, Text)])
+getUpdateGetParams
+    :: PageParamName -> WidgetFor site (PageNumber -> [(Text, Text)])
 getUpdateGetParams pageParamName = do
     params <- handlerToWidget $ reqGetParams <$> getRequest
-    pure $ \number -> nubOn fst $ [(unPageParamName pageParamName, tshow number)] <> params
+    pure
+        $ \number ->
+              nubOn fst
+                  $ [(unPageParamName pageParamName, tshow number)]
+                  <> params
 
 renderGetParams :: [(Text, Text)] -> Text
 renderGetParams [] = ""

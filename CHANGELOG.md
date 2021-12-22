@@ -1,6 +1,12 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.1.0...master)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.0...main)
 
 None
+
+## [v1.1.2.0](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.1.0...v1.1.2.0)
+
+- Re-licensed from BSD3 to MIT
+- Released with tight lower bounds and no upper bounds
+- Internal modernizations
 
 ## [v1.1.1.0](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.0.2...v1.1.1.0)
 

@@ -31,8 +31,7 @@ module Yesod.Paginator.Pages
     , takeNextPages
     , getPreviousPage
     , getNextPage
-    )
-where
+    ) where
 
 import Yesod.Paginator.Prelude
 
@@ -40,22 +39,19 @@ import Text.Blaze (ToMarkup)
 import Web.PathPieces
 
 newtype PageNumber = PageNumber Natural
-    deriving (Enum, Eq, Integral, Num, Ord, Real)
-    deriving newtype (Show, ToMarkup)
+    deriving newtype (Enum, Eq, Integral, Num, Ord, Real, Show, ToMarkup)
 
 newtype PerPage = PerPage Natural
-    deriving (Enum, Eq, Integral, Num, Ord, Real)
-    deriving newtype (Read, Show, PathPiece)
+    deriving newtype (Enum, Eq, Integral, Num, Ord, Real, Read, Show, PathPiece)
 
 newtype ItemsCount = ItemsCount Natural
-    deriving (Enum, Eq, Integral, Num, Ord, Real)
-    deriving newtype (Read, Show, PathPiece)
+    deriving newtype (Enum, Eq, Integral, Num, Ord, Real, Read, Show, PathPiece)
 
 data Page a = Page
     { pageItems :: [a]
     , pageNumber :: PageNumber
     }
-    deriving (Eq, Show)
+    deriving stock (Eq, Show)
 
 setPageItems :: Page a -> [b] -> Page b
 setPageItems page items = page { pageItems = items }
@@ -82,7 +78,7 @@ data Pages a = Pages
     , pagesNext :: [PageNumber]
     , pagesLast :: PageNumber
     }
-    deriving (Eq, Show)
+    deriving stock (Eq, Show)
 
 setPagesCurrent :: Pages a -> Page b -> Pages b
 setPagesCurrent pages current = pages { pagesCurrent = current }
@@ -97,7 +93,8 @@ instance Foldable Pages where
     foldMap f = foldMap f . pagesCurrent
 
 instance Traversable Pages where
-    traverse f pages = setPagesCurrent pages <$> traverse f (pagesCurrent pages)
+    traverse f pages =
+        setPagesCurrent pages <$> traverse f (pagesCurrent pages)
 
 -- | Take previous pages, going back from current
 --
@@ -168,6 +165,7 @@ toPages number per total items = Pages
 getLastPage :: ItemsCount -> PerPage -> PageNumber
 getLastPage total = fromIntegral . carry . (total `divMod`) . fromIntegral
   where
+    carry :: (Eq a, Num a) => (a, a) -> a
     carry (q, 0) = q
     carry (q, _) = q + 1
 
