@@ -17,10 +17,6 @@ jobs:
         with:
           stack-arguments: --flag yesod-paginator:examples --coverage
 
-      # - uses: freckle/weeder-action@v1
-      #   with:
-      #     weeder-version: 2.2.0
-
       - name: Reformat coverage
         run: |
           tix='${{ steps.stack.outputs.local-hpc-root }}/combined/all/all.tix'
