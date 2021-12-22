@@ -21,15 +21,15 @@ jobs:
       #   with:
       #     weeder-version: 2.2.0
 
-      # - name: Reformat coverage
-      #   run: |
-      #     tix='${{ steps.stack.outputs.local-hpc-root }}/combined/all/all.tix'
-      #     stack --no-terminal install --copy-compiler-tool hpc-lcov
-      #     stack --no-terminal exec -- hpc-lcov --file "$tix"
+      - name: Reformat coverage
+        run: |
+          tix='${{ steps.stack.outputs.local-hpc-root }}/combined/all/all.tix'
+          stack --no-terminal install --copy-compiler-tool hpc-lcov
+          stack --no-terminal exec -- hpc-lcov --file "$tix"
 
-      # - uses: codecov/codecov-action@v2
-      #   with:
-      #     files: ./lcov.info
+      - uses: codecov/codecov-action@v2
+        with:
+          files: ./lcov.info
 
   hlint:
     runs-on: ubuntu-latest
