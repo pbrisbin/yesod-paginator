@@ -3,9 +3,15 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# OPTIONS_GHC -fno-warn-unused-top-binds #-}
+{-# OPTIONS_GHC -Wno-missing-deriving-strategies #-}
+{-# OPTIONS_GHC -Wno-missing-local-signatures #-}
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Main (main) where
+module Main
+    ( main
+    ) where
+
+import Prelude
 
 import Network.Wai.Handler.Warp (run)
 import Yesod
@@ -37,7 +43,7 @@ instance Yesod App where
 
 getRootR :: Handler Html
 getRootR = do
-    let things' = [1..1142] :: [Int]
+    let things' = [1 .. 1142] :: [Int]
 
     pages <- paginate 3 things'
 
