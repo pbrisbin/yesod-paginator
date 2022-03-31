@@ -1,0 +1,4 @@
+resolver: lts-12.26
+extra-deps:
+  - quickcheck-classes-0.4.13
+  - semirings-0.1.3.0

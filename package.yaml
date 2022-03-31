@@ -10,7 +10,24 @@ homepage: http://github.com/pbrisbin/yesod-paginator
 dependencies:
   - base < 5
 
-ghc-options: -Wall
+ghc-options:
+  - -Weverything
+  - -Wno-all-missed-specialisations
+  - -Wno-missing-import-lists
+  - -Wno-safe
+  - -Wno-unsafe
+
+when:
+  - condition: impl(ghc >= 9.2)
+    ghc-options:
+      - -Wno-missing-kind-signatures
+  - condition: impl(ghc >= 8.10)
+    ghc-options:
+      - -Wno-missing-safe-haskell-mode
+      - -Wno-prepositive-qualified-module
+  - condition: impl(ghc >= 8.8)
+    ghc-options:
+      - -fwrite-ide-info
 
 default-extensions:
   - NoImplicitPrelude
@@ -50,6 +67,11 @@ tests:
       - yesod-core
       - yesod-paginator
       - yesod-test
+    when:
+      - condition: impl(ghc >= 8.8)
+        ghc-options:
+          - -Wno-missing-deriving-strategies
+
   doctests:
     main: Main.hs
     source-dirs: doctest
