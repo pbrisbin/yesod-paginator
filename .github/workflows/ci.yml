@@ -47,8 +47,6 @@ jobs:
 
       - if: ${{ matrix.stack-yaml == 'stack.yaml' }}
         uses: freckle/weeder-action@v1
-        with:
-          weeder-version: 2.2.0
 
   hlint:
     runs-on: ubuntu-latest
