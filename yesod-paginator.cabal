@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           yesod-paginator
-version:        1.1.2.0
+version:        1.1.2.1
 synopsis:       A pagination approach for yesod
 description:    Paginate a list showing a per-item widget and links to other pages
 category:       Web, Yesod
