@@ -1,6 +1,10 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.0...main)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.1...main)
 
 None
+
+## [v1.1.2.1](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.0...v1.1.2.1)
+
+- Support GHCs 9.0 and 9.2
 
 ## [v1.1.2.0](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.1.0...v1.1.2.0)
 
