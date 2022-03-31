@@ -35,7 +35,7 @@ library
       src
   default-extensions:
       NoImplicitPrelude
-  ghc-options: -Wall
+  ghc-options: -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-safe -Wno-unsafe
   build-depends:
       base <5
     , blaze-markup
@@ -46,6 +46,12 @@ library
     , transformers
     , uri-encode
     , yesod-core
+  if impl(ghc >= 9.2)
+    ghc-options: -Wno-missing-kind-signatures
+  if impl(ghc >= 8.10)
+    ghc-options: -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+  if impl(ghc >= 8.8)
+    ghc-options: -fwrite-ide-info
   default-language: Haskell2010
 
 executable yesod-paginator-example
@@ -56,12 +62,18 @@ executable yesod-paginator-example
       example
   default-extensions:
       NoImplicitPrelude
-  ghc-options: -Wall
+  ghc-options: -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-safe -Wno-unsafe
   build-depends:
       base <5
     , warp
     , yesod
     , yesod-paginator
+  if impl(ghc >= 9.2)
+    ghc-options: -Wno-missing-kind-signatures
+  if impl(ghc >= 8.10)
+    ghc-options: -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+  if impl(ghc >= 8.8)
+    ghc-options: -fwrite-ide-info
   if !(flag(examples))
     buildable: False
   default-language: Haskell2010
@@ -75,10 +87,16 @@ test-suite doctests
       doctest
   default-extensions:
       NoImplicitPrelude
-  ghc-options: -Wall
+  ghc-options: -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-safe -Wno-unsafe
   build-depends:
       base <5
     , doctest
+  if impl(ghc >= 9.2)
+    ghc-options: -Wno-missing-kind-signatures
+  if impl(ghc >= 8.10)
+    ghc-options: -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+  if impl(ghc >= 8.8)
+    ghc-options: -fwrite-ide-info
   default-language: Haskell2010
 
 test-suite test
@@ -93,7 +111,7 @@ test-suite test
       test
   default-extensions:
       NoImplicitPrelude
-  ghc-options: -Wall
+  ghc-options: -Weverything -Wno-all-missed-specialisations -Wno-missing-import-lists -Wno-safe -Wno-unsafe
   build-depends:
       QuickCheck
     , base <5
@@ -102,4 +120,12 @@ test-suite test
     , yesod-core
     , yesod-paginator
     , yesod-test
+  if impl(ghc >= 9.2)
+    ghc-options: -Wno-missing-kind-signatures
+  if impl(ghc >= 8.10)
+    ghc-options: -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
+  if impl(ghc >= 8.8)
+    ghc-options: -fwrite-ide-info
+  if impl(ghc >= 8.8)
+    ghc-options: -Wno-missing-deriving-strategies
   default-language: Haskell2010
