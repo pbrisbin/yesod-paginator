@@ -178,10 +178,12 @@ getUpdateGetParams
 getUpdateGetParams pageParamName = do
     params <- handlerToWidget $ reqGetParams <$> getRequest
     pure
-        $ \number ->
-              nubOn fst
-                  $ [(unPageParamName pageParamName, tshow number)]
-                  <> params
+        $ \number -> formatParams number params
+  where
+    formatParams :: Show a => a -> [(Text, Text)] -> [(Text, Text)]
+    formatParams number params =
+      let name = unPageParamName pageParamName
+      in [(name, tshow number)] <> filter ((/=) name . fst) params
 
 renderGetParams :: [(Text, Text)] -> Text
 renderGetParams [] = ""

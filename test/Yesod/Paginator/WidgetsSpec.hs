@@ -8,7 +8,8 @@ import SpecHelper
 
 spec :: Spec
 spec = withApp $ do
-    describe "simple" $ it "works" $ do
+    describe "simple" $ do
+      it "works" $ do
         get $ SimpleR 10 3 3
 
         statusIs 200
@@ -49,6 +50,27 @@ spec = withApp $ do
             , "<li class=\"prev\"><a href=\"?p=3\">3</a></li>"
             , "<li class=\"active disabled\"><a>4</a></li>"
             , "<li class=\"next disabled\"><a>»</a></li>"
+            , "</ul>"
+            ]
+
+      it "includes all parameters with the same name" $ do
+        get $ SimpleR 10 3 3
+
+        request $ do
+            addGetParam "p" "3"
+            addGetParam "ids[]" "1"
+            addGetParam "ids[]" "2"
+            setUrl $ SimpleR 10 3 3
+
+        statusIs 200
+
+        bodyContains $ concat
+            [ "<ul class=\"pagination\">"
+            , "<li class=\"prev\"><a href=\"?p=2&amp;ids%5B%5D=2&amp;ids%5B%5D=1\">«</a></li>"
+            , "<li class=\"prev\"><a href=\"?p=2&amp;ids%5B%5D=2&amp;ids%5B%5D=1\">2</a></li>"
+            , "<li class=\"active disabled\"><a>3</a></li>"
+            , "<li class=\"next\"><a href=\"?p=4&amp;ids%5B%5D=2&amp;ids%5B%5D=1\">4</a></li>"
+            , "<li class=\"next\"><a href=\"?p=4&amp;ids%5B%5D=2&amp;ids%5B%5D=1\">»</a></li>"
             , "</ul>"
             ]
 
