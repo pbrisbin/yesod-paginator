@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Yesod.Paginator.WidgetsSpec
     ( spec
-    )
-where
+    ) where
 
 import SpecHelper
 
@@ -189,3 +188,21 @@ spec = withApp $ do
             , "<li class=\"next disabled\"><a>»</a></li>"
             , "</ul>"
             ]
+
+    describe "filterParams" $ it "works" $ do
+        let pageParamName = PageParamName "p"
+            pageNumber :: Int
+            pageNumber = 3
+            params :: [(Text, Text)]
+            params =
+                [ ("p", "2")
+                , ("p", "3")
+                , ("foo", "bar")
+                , ("ids[]", "1")
+                , ("ids[]", "2")
+                ]
+
+        assertEq
+            "filters page params not equal to the page number but keeps query params with the same name"
+            (filterParams pageParamName pageNumber params)
+            [("p", "3"), ("foo", "bar"), ("ids[]", "1"), ("ids[]", "2")]

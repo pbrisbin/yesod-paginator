@@ -14,6 +14,7 @@ import Test.Hspec as X
 import Yesod.Core
 import Yesod.Paginator as X
 import Yesod.Paginator.Prelude as X
+import Yesod.Paginator.Widgets as X
 import Yesod.Test as X
 
 data App = App
