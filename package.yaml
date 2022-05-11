@@ -1,5 +1,5 @@
 name: yesod-paginator
-version: 1.1.2.1
+version: 1.1.2.2
 synopsis: A pagination approach for yesod
 description: Paginate a list showing a per-item widget and links to other pages
 category: Web, Yesod
