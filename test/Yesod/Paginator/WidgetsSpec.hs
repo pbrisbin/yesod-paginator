@@ -189,7 +189,7 @@ spec = withApp $ do
             , "</ul>"
             ]
 
-    describe "filterParams" $ it "works" $ do
+    describe "buildParams" $ it "works" $ do
         let pageParamName = PageParamName "p"
             pageNumber :: Int
             pageNumber = 3
@@ -202,7 +202,6 @@ spec = withApp $ do
                 , ("ids[]", "2")
                 ]
 
-        assertEq
-            "filters page params not equal to the page number but keeps query params with the same name"
-            (filterParams pageParamName pageNumber params)
-            [("p", "3"), ("foo", "bar"), ("ids[]", "1"), ("ids[]", "2")]
+        buildParams pageParamName pageNumber params
+          `shouldBe`
+          [("p", "3"), ("foo", "bar"), ("ids[]", "1"), ("ids[]", "2")]

@@ -10,7 +10,8 @@ module SpecHelper
     , module X
     ) where
 
-import Test.Hspec as X
+import Test.Hspec as X hiding (shouldBe)
+import Test.Hspec.Expectations.Lifted as HspecLifted
 import Yesod.Core
 import Yesod.Paginator as X
 import Yesod.Paginator.Prelude as X
@@ -62,3 +63,7 @@ getEllipsedParamNameR total per elements pageParamName = do
 
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)
+
+shouldBe :: (HasCallStack, Eq a, Show a) => a -> a -> YesodExample site ()
+shouldBe a b =
+  a `HspecLifted.shouldBe` b
