@@ -4,8 +4,7 @@ None
 
 ## [v1.1.2.2](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.1...v1.1.2.2)
 
-- Fix (issue with filtering out query
-  parameters)[https://github.com/pbrisbin/yesod-paginator/issues/40]
+- Fix issue with filtering out query parameters [@eahlberg](https://github.com/pbrisbin/yesod-paginator/issues/40)
 
 ## [v1.1.2.1](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.0...v1.1.2.1)
 
