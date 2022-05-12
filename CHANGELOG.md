@@ -1,4 +1,4 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.1...main)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.2...main)
 
 None
 
