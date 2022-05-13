@@ -65,5 +65,4 @@ withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)
 
 shouldBe :: (HasCallStack, Eq a, Show a) => a -> a -> YesodExample site ()
-shouldBe a b =
-  a `HspecLifted.shouldBe` b
+shouldBe a b = a `HspecLifted.shouldBe` b

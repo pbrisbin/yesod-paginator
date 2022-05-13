@@ -203,5 +203,8 @@ spec = withApp $ do
                 ]
 
         buildParams pageParamName pageNumber params
-          `shouldBe`
-          [("p", "3"), ("foo", "bar"), ("ids[]", "1"), ("ids[]", "2")]
+            `shouldBe` [ ("p", "3")
+                       , ("foo", "bar")
+                       , ("ids[]", "1")
+                       , ("ids[]", "2")
+                       ]
