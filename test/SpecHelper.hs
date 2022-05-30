@@ -10,8 +10,8 @@ module SpecHelper
     , module X
     ) where
 
-import Test.Hspec as X hiding (shouldBe)
-import Test.Hspec.Expectations.Lifted as HspecLifted
+import qualified Data.List as List
+import Test.Hspec as X
 import Yesod.Core
 import Yesod.Paginator as X
 import Yesod.Paginator.Prelude as X
@@ -64,5 +64,20 @@ getEllipsedParamNameR total per elements pageParamName = do
 withApp :: SpecWith (TestApp App) -> Spec
 withApp = before $ pure (App, id)
 
-shouldBe :: (HasCallStack, Eq a, Show a) => a -> a -> YesodExample site ()
-shouldBe a b = a `HspecLifted.shouldBe` b
+shouldIncludeAll
+    :: (Foldable t, Eq a, Show a, Show (t a)) => t a -> [a] -> Expectation
+shouldIncludeAll actual subset = expectTrue msg (all isIncluded subset)
+  where
+    isIncluded = (`elem` actual)
+    msg =
+        show actual
+            <> " did not include all of "
+            <> show subset
+            <> " - missing: "
+            <> List.intercalate
+                   ", "
+                   (fmap show (filter (not . isIncluded) subset))
+
+-- Cloned from 'Test.Hspec.Expectations'
+expectTrue :: HasCallStack => String -> Bool -> Expectation
+expectTrue msg b = unless b (expectationFailure msg)

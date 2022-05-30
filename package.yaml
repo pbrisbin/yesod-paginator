@@ -63,7 +63,6 @@ tests:
     dependencies:
       - QuickCheck
       - hspec
-      - hspec-expectations-lifted
       - quickcheck-classes
       - yesod-core
       - yesod-paginator

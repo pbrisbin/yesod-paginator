@@ -116,7 +116,6 @@ test-suite test
       QuickCheck
     , base <5
     , hspec
-    , hspec-expectations-lifted
     , quickcheck-classes
     , yesod-core
     , yesod-paginator

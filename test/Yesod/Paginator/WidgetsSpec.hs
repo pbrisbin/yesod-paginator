@@ -1,12 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Yesod.Paginator.WidgetsSpec
     ( spec
     ) where
 
+import Data.Functor ((<&>))
 import SpecHelper
+import Test.Hspec.QuickCheck
+import Test.QuickCheck
 
 spec :: Spec
-spec = withApp $ do
+spec = integrationSpecs >> setPageParametersSpecs
+
+integrationSpecs :: Spec
+integrationSpecs = withApp $ do
     describe "simple" $ it "works" $ do
         get $ SimpleR 10 3 3
 
@@ -189,22 +196,47 @@ spec = withApp $ do
             , "</ul>"
             ]
 
-    describe "buildParams" $ it "works" $ do
-        let pageParamName = PageParamName "p"
-            pageNumber :: Int
-            pageNumber = 3
-            params :: [(Text, Text)]
-            params =
-                [ ("p", "2")
-                , ("p", "3")
-                , ("foo", "bar")
-                , ("ids[]", "1")
-                , ("ids[]", "2")
-                ]
+data Params = Params
+    { paramsPageParamName :: PageParamName
+    , paramsPageNumber :: Int
+    , paramsParams :: [(Text, Text)]
+    }
+    deriving Show
 
-        buildParams pageParamName pageNumber params
-            `shouldBe` [ ("p", "3")
-                       , ("foo", "bar")
-                       , ("ids[]", "1")
-                       , ("ids[]", "2")
-                       ]
+instance Arbitrary Params where
+    arbitrary = do
+        params <- listOf $ liftArbitrary2 genText genText
+        pageNumber <- getPositive <$> arbitrary
+        pageParamName <- PageParamName <$> genText
+        pure $ Params pageParamName pageNumber params
+      where
+        genText :: Gen Text
+        genText = listOf (choose ('a', 'z')) <&> pack
+
+
+setPageParametersSpecs :: Spec
+setPageParametersSpecs = describe "setPageParameters" $ do
+    it "inserts" $ do
+        let paramName = PageParamName "p"
+            pageNumber = 1 :: Int
+        setPageParameters paramName pageNumber [] `shouldBe` [("p", "1")]
+
+    it "updates" $ do
+        let paramName = PageParamName "p"
+            pageNumber = 1 :: Int
+        setPageParameters paramName pageNumber [("p", "foo")]
+            `shouldBe` [("p", "1")]
+
+    prop "doesn't remove not-ours elements" $ do
+        Params paramName pageNumber params <- arbitrary
+        let outputKeys = fst <$> setPageParameters paramName pageNumber params
+            inputKeys = fst <$> params
+        pure $ outputKeys `shouldIncludeAll` inputKeys
+
+    prop "doesn't add not-ours elements" $ do
+        Params paramName pageNumber params <- arbitrary
+        let outputKeys = fst <$> setPageParameters paramName pageNumber params
+            inputKeys = fst <$> params
+        pure
+            $ (unPageParamName paramName : inputKeys)
+            `shouldIncludeAll` outputKeys
