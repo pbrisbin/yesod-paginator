@@ -1,13 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Yesod.Paginator.WidgetsSpec
     ( spec
-    )
-where
+    ) where
 
+import Data.Functor ((<&>))
 import SpecHelper
+import Test.QuickCheck
 
 spec :: Spec
-spec = withApp $ do
+spec = do
+  withApp $ do
     describe "simple" $ it "works" $ do
         get $ SimpleR 10 3 3
 
@@ -189,3 +192,42 @@ spec = withApp $ do
             , "<li class=\"next disabled\"><a>»</a></li>"
             , "</ul>"
             ]
+
+  it "inserts" $ do
+      let paramName = PageParamName "p"
+          pageNumber = 1 :: Int
+      setPageParameters paramName pageNumber [] `shouldBe` [("p", "1")]
+
+  it "updates" $ do
+      let paramName = PageParamName "p"
+          pageNumber = 1 :: Int
+      setPageParameters paramName pageNumber [("p", "foo")]
+          `shouldBe` [("p", "1")]
+
+  it "doesn't remove not-ours elements" $ property $ \(Params paramName pageNumber params) -> do
+    let outputKeys =
+            fst <$> setPageParameters paramName pageNumber params
+        inputKeys = fst <$> params
+     in all (`elem` outputKeys) inputKeys
+
+  it "doesn't add not-ours elements" $ property $ \(Params paramName pageNumber params) -> do
+      let outputKeys = fst <$> setPageParameters paramName pageNumber params
+          inputKeys = fst <$> params
+       in all (`elem` (unPageParamName paramName : inputKeys)) outputKeys
+
+data Params = Params
+    { paramsPageParamName :: PageParamName
+    , paramsPageNumber :: Int
+    , paramsParams :: [(Text, Text)]
+    }
+    deriving Show
+
+instance Arbitrary Params where
+    arbitrary = do
+        params <- listOf $ liftArbitrary2 genText genText
+        pageNumber <- getPositive <$> arbitrary
+        pageParamName <- PageParamName <$> genText
+        pure $ Params pageParamName pageNumber params
+      where
+        genText :: Gen Text
+        genText = listOf (choose ('a', 'z')) <&> pack

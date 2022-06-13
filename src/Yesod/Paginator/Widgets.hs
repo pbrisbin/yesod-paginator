@@ -7,6 +7,9 @@ module Yesod.Paginator.Widgets
     , simpleWith
     , ellipsed
     , ellipsedWith
+
+    -- * Exported for testing
+    , setPageParameters
     ) where
 
 import Yesod.Paginator.Prelude
@@ -177,13 +180,15 @@ getUpdateGetParams
     :: PageParamName -> WidgetFor site (PageNumber -> [(Text, Text)])
 getUpdateGetParams pageParamName = do
     params <- handlerToWidget $ reqGetParams <$> getRequest
-    pure
-        $ \number ->
-              nubOn fst
-                  $ [(unPageParamName pageParamName, tshow number)]
-                  <> params
+    pure $ \number -> setPageParameters pageParamName number params
 
 renderGetParams :: [(Text, Text)] -> Text
 renderGetParams [] = ""
 renderGetParams ps = "?" <> T.intercalate "&" (map renderGetParam ps)
     where renderGetParam (k, v) = encodeText k <> "=" <> encodeText v
+
+setPageParameters
+    :: Show a => PageParamName -> a -> [(Text, Text)] -> [(Text, Text)]
+setPageParameters pageParamName number params =
+    let name = unPageParamName pageParamName
+    in [(name, tshow number)] <> filter ((/=) name . fst) params
