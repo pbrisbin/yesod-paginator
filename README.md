@@ -1,5 +1,11 @@
 # yesod-paginator
 
+
+[![Hackage](https://img.shields.io/hackage/v/yesod-paginator.svg?style=flat)](https://hackage.haskell.org/package/yesod-paginator)
+[![Stackage Nightly](http://stackage.org/package/yesod-paginator/badge/nightly)](http://stackage.org/nightly/package/yesod-paginator)
+[![Stackage LTS](http://stackage.org/package/yesod-paginator/badge/lts)](http://stackage.org/lts/package/yesod-paginator)
+[![CI](https://github.com/pbrisbin/yesod-paginator/actions/workflows/ci.yml/badge.svg)](https://github.com/pbrisbin/yesod-paginator/actions/workflows/ci.yml)
+
 Handle a database query and/or array-math to paginate a list and produce a page
 of items along with a pagination widget for navigating them.
 
