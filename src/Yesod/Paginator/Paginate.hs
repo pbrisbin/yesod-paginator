@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Yesod.Paginator.Paginate
     ( paginate
@@ -12,8 +13,7 @@ module Yesod.Paginator.Paginate
     , PaginationConfig(..)
     , PageParamName(..)
     , defaultPaginationConfig
-    )
-where
+    ) where
 
 import Yesod.Paginator.Prelude
 

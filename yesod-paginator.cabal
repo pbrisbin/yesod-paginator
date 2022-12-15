@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.5.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -46,13 +46,13 @@ library
     , transformers
     , uri-encode
     , yesod-core
+  default-language: Haskell2010
   if impl(ghc >= 9.2)
     ghc-options: -Wno-missing-kind-signatures
   if impl(ghc >= 8.10)
     ghc-options: -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
   if impl(ghc >= 8.8)
     ghc-options: -fwrite-ide-info
-  default-language: Haskell2010
 
 executable yesod-paginator-example
   main-is: Main.hs
@@ -68,6 +68,7 @@ executable yesod-paginator-example
     , warp
     , yesod
     , yesod-paginator
+  default-language: Haskell2010
   if impl(ghc >= 9.2)
     ghc-options: -Wno-missing-kind-signatures
   if impl(ghc >= 8.10)
@@ -76,7 +77,6 @@ executable yesod-paginator-example
     ghc-options: -fwrite-ide-info
   if !(flag(examples))
     buildable: False
-  default-language: Haskell2010
 
 test-suite doctests
   type: exitcode-stdio-1.0
@@ -91,13 +91,13 @@ test-suite doctests
   build-depends:
       base <5
     , doctest
+  default-language: Haskell2010
   if impl(ghc >= 9.2)
     ghc-options: -Wno-missing-kind-signatures
   if impl(ghc >= 8.10)
     ghc-options: -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module
   if impl(ghc >= 8.8)
     ghc-options: -fwrite-ide-info
-  default-language: Haskell2010
 
 test-suite test
   type: exitcode-stdio-1.0
@@ -120,6 +120,7 @@ test-suite test
     , yesod-core
     , yesod-paginator
     , yesod-test
+  default-language: Haskell2010
   if impl(ghc >= 9.2)
     ghc-options: -Wno-missing-kind-signatures
   if impl(ghc >= 8.10)
@@ -128,4 +129,3 @@ test-suite test
     ghc-options: -fwrite-ide-info
   if impl(ghc >= 8.8)
     ghc-options: -Wno-missing-deriving-strategies
-  default-language: Haskell2010
