@@ -4,3 +4,9 @@
 # git config blame.ignoreRevsFile .git-blame-ignore-revs
 #
 ###
+
+# Migration to Fourmolu
+7f1a7dbd0b02377ed144f0b44afffbe4a05b17da
+
+# Configure Brittany and Restyled
+f422bd0bbe47e90c380e7a33713957ae749cc3dc
