@@ -24,42 +24,35 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: freckle/stack-cache-action@v1
-        with:
-          stack-yaml: ${{ matrix.stack-yaml }}
+      - uses: actions/checkout@v4
 
       - id: stack
-        uses: freckle/stack-action@v3
+        uses: freckle/stack-action@v5
         with:
           stack-yaml: ${{ matrix.stack-yaml }}
           stack-arguments: --coverage
+          compiler-tools: hpc-lcov
 
       - if: ${{ matrix.stack-yaml == 'stack.yaml' }}
         name: Reformat coverage
-        run: |
-          tix='${{ steps.stack.outputs.local-hpc-root }}/combined/all/all.tix'
-          stack --resolver lts-18.28 --no-terminal install --copy-compiler-tool hpc-lcov
-          stack --resolver lts-18.28 --no-terminal exec -- hpc-lcov --file "$tix"
+        run: stack exec -- hpc-lcov --file '${{ steps.stack.outputs.local-hpc-root }}/combined/all/all.tix'
 
       - if: ${{ matrix.stack-yaml == 'stack.yaml' }}
         name: Upload coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v4
         with:
           files: ./lcov.info
 
       - if: ${{ matrix.stack-yaml == 'stack.yaml' }}
-        uses: freckle/weeder-action@v1
+        uses: freckle/weeder-action@v2
         with:
-          weeder-version: 2.3.0
+          ghc-version: ${{ steps.stack.outputs.compiler-version }}
 
   hlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: rwe/actions-hlint-setup@v1
-      - run: |
-          curl -o .hlint.yaml https://raw.githubusercontent.com/pbrisbin/dotfiles/master/hlint.yaml
-      - uses: rwe/actions-hlint-run@v2
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/hlint-setup@v2
+      - uses: haskell-actions/hlint-run@v2
         with:
           fail-on: warning
