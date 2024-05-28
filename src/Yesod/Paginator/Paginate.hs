@@ -3,17 +3,17 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Yesod.Paginator.Paginate
-    ( paginate
-    , paginate'
-    , paginateWith
-    , selectPaginated
-    , selectPaginated'
-    , selectPaginatedWith
-    , getCurrentPage
-    , PaginationConfig(..)
-    , PageParamName(..)
-    , defaultPaginationConfig
-    ) where
+  ( paginate
+  , paginate'
+  , paginateWith
+  , selectPaginated
+  , selectPaginated'
+  , selectPaginatedWith
+  , getCurrentPage
+  , PaginationConfig (..)
+  , PageParamName (..)
+  , defaultPaginationConfig
+  ) where
 
 import Yesod.Paginator.Prelude
 
@@ -26,11 +26,12 @@ import Yesod.Paginator.PaginationConfig
 -- | Paginate a list of items
 paginate :: MonadHandler m => PerPage -> [a] -> m (Pages a)
 paginate per =
-    paginateWith defaultPaginationConfig { paginationConfigPerPage = per }
+  paginateWith defaultPaginationConfig {paginationConfigPerPage = per}
 
 -- | Paginate a list of items given a pagination config
 paginateWith :: MonadHandler m => PaginationConfig -> [a] -> m (Pages a)
-paginateWith config items = paginate' (paginationConfigPerPage config) items
+paginateWith config items =
+  paginate' (paginationConfigPerPage config) items
     <$> (getCurrentPageWith . paginationConfigPageParamName) config
 
 -- | A version where the current page is given
@@ -51,74 +52,80 @@ paginateWith config items = paginate' (paginationConfigPerPage config) items
 --
 -- >>> paginate' 3 ([1..10] :: [Int]) 5
 -- Pages {pagesCurrent = Page {pageItems = [], pageNumber = 5}, pagesPrevious = [1,2,3,4], pagesNext = [], pagesLast = 4}
---
 paginate' :: PerPage -> [a] -> PageNumber -> Pages a
 paginate' per items p =
-    toPages p per (genericLength items) $ genericTake per $ genericDrop
+  toPages p per (genericLength items) $
+    genericTake per $
+      genericDrop
         (pageOffset p per)
         items
 
 -- | Paginate out of a persistent database
 selectPaginated
-    :: ( MonadHandler m
-       , PersistEntity record
-       , PersistEntityBackend record ~ BaseBackend backend
-       , PersistQueryRead backend
-       )
-    => PerPage
-    -> [Filter record]
-    -> [SelectOpt record]
-    -> ReaderT backend m (Pages (Entity record))
-selectPaginated per = selectPaginatedWith defaultPaginationConfig
-    { paginationConfigPerPage = per
-    }
+  :: ( MonadHandler m
+     , PersistEntity record
+     , PersistEntityBackend record ~ BaseBackend backend
+     , PersistQueryRead backend
+     )
+  => PerPage
+  -> [Filter record]
+  -> [SelectOpt record]
+  -> ReaderT backend m (Pages (Entity record))
+selectPaginated per =
+  selectPaginatedWith
+    defaultPaginationConfig
+      { paginationConfigPerPage = per
+      }
 
 -- | Paginate out of a persistent database given a pagination config
 selectPaginatedWith
-    :: ( MonadHandler m
-       , PersistEntity record
-       , PersistEntityBackend record ~ BaseBackend backend
-       , PersistQueryRead backend
-       )
-    => PaginationConfig
-    -> [Filter record]
-    -> [SelectOpt record]
-    -> ReaderT backend m (Pages (Entity record))
+  :: ( MonadHandler m
+     , PersistEntity record
+     , PersistEntityBackend record ~ BaseBackend backend
+     , PersistQueryRead backend
+     )
+  => PaginationConfig
+  -> [Filter record]
+  -> [SelectOpt record]
+  -> ReaderT backend m (Pages (Entity record))
 selectPaginatedWith config filters options =
-    selectPaginated' (paginationConfigPerPage config) filters options
-        =<< lift ((getCurrentPageWith . paginationConfigPageParamName) config)
+  selectPaginated' (paginationConfigPerPage config) filters options
+    =<< lift ((getCurrentPageWith . paginationConfigPageParamName) config)
 
 -- | A version where the current page is given
 --
 -- This can be used to avoid the @'MonadHandler'@ context.
---
 selectPaginated'
-    :: ( MonadIO m
-       , PersistEntity record
-       , PersistEntityBackend record ~ BaseBackend backend
-       , PersistQueryRead backend
-       )
-    => PerPage
-    -> [Filter record]
-    -> [SelectOpt record]
-    -> PageNumber
-    -> ReaderT backend m (Pages (Entity record))
+  :: ( MonadIO m
+     , PersistEntity record
+     , PersistEntityBackend record ~ BaseBackend backend
+     , PersistQueryRead backend
+     )
+  => PerPage
+  -> [Filter record]
+  -> [SelectOpt record]
+  -> PageNumber
+  -> ReaderT backend m (Pages (Entity record))
 selectPaginated' per filters options p =
-    toPages p per <$> (fromIntegral <$> count filters) <*> selectList
-        filters
-        (options
-        <> [ OffsetBy $ fromIntegral $ pageOffset p per
-           , LimitTo $ fromIntegral per
-           ]
-        )
+  toPages p per
+    <$> (fromIntegral <$> count filters)
+    <*> selectList
+      filters
+      ( options
+          <> [ OffsetBy $ fromIntegral $ pageOffset p per
+             , LimitTo $ fromIntegral per
+             ]
+      )
 
 getCurrentPage :: MonadHandler m => m PageNumber
 getCurrentPage =
-    getCurrentPageWith (paginationConfigPageParamName defaultPaginationConfig)
+  getCurrentPageWith (paginationConfigPageParamName defaultPaginationConfig)
 
 getCurrentPageWith :: MonadHandler m => PageParamName -> m PageNumber
-getCurrentPageWith pageParamName = fromMaybe 1 . go <$> lookupGetParam
-    (unPageParamName pageParamName)
-  where
-    go :: Maybe Text -> Maybe PageNumber
-    go mp = readIntegral . unpack =<< mp
+getCurrentPageWith pageParamName =
+  fromMaybe 1 . go
+    <$> lookupGetParam
+      (unPageParamName pageParamName)
+ where
+  go :: Maybe Text -> Maybe PageNumber
+  go mp = readIntegral . unpack =<< mp

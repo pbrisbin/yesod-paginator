@@ -33,38 +33,36 @@
 --             ^{'simple' 5 pages}
 --             |]
 -- @
---
 module Yesod.Paginator
-    (
-    -- * Type-safe numerics
-      PageNumber
-    , PerPage
-    , ItemsCount
+  ( -- * Type-safe numerics
+    PageNumber
+  , PerPage
+  , ItemsCount
 
     -- * Paginated data
-    , Pages
-    , pagesCurrent
+  , Pages
+  , pagesCurrent
 
     -- * The current page
-    , Page
-    , pageItems
+  , Page
+  , pageItems
 
     -- * Paginators
-    , paginate
-    , paginateWith
-    , selectPaginated
-    , selectPaginatedWith
+  , paginate
+  , paginateWith
+  , selectPaginated
+  , selectPaginatedWith
 
     -- * Widgets
-    , simple
-    , simpleWith
-    , ellipsed
-    , ellipsedWith
+  , simple
+  , simpleWith
+  , ellipsed
+  , ellipsedWith
 
     -- * Pagination configuration
-    , PaginationConfig(..)
-    , PageParamName(..)
-    )
+  , PaginationConfig (..)
+  , PageParamName (..)
+  )
 where
 
 import Yesod.Paginator.Pages

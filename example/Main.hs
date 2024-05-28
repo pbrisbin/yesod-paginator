@@ -8,8 +8,8 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module Main
-    ( main
-    ) where
+  ( main
+  ) where
 
 import Prelude
 
@@ -19,15 +19,18 @@ import Yesod.Paginator
 
 data App = App
 
-mkYesod "App" [parseRoutes|
+mkYesod
+  "App"
+  [parseRoutes|
     / RootR GET
 |]
 
 instance Yesod App where
-    approot = ApprootRelative
-    defaultLayout widget = do
-        pc <- widgetToPageContent widget
-        withUrlRenderer [hamlet|$newline never
+  approot = ApprootRelative
+  defaultLayout widget = do
+    pc <- widgetToPageContent widget
+    withUrlRenderer
+      [hamlet|$newline never
             $doctype 5
             <html lang="en">
                 <head>
@@ -43,13 +46,13 @@ instance Yesod App where
 
 getRootR :: Handler Html
 getRootR = do
-    let things' = [1 .. 1142] :: [Int]
+  let things' = [1 .. 1142] :: [Int]
 
-    pages <- paginate 3 things'
+  pages <- paginate 3 things'
 
-    defaultLayout $ do
-        setTitle "My title"
-        [whamlet|$newline never
+  defaultLayout $ do
+    setTitle "My title"
+    [whamlet|$newline never
             <h1>Pagination Examples
             <h2>The things:
             <ul>
