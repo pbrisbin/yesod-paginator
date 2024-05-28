@@ -2,15 +2,15 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 module Yesod.Paginator.Widgets
-    ( PaginationWidget
-    , simple
-    , simpleWith
-    , ellipsed
-    , ellipsedWith
+  ( PaginationWidget
+  , simple
+  , simpleWith
+  , ellipsed
+  , ellipsedWith
 
     -- * Exported for testing
-    , setPageParameters
-    ) where
+  , setPageParameters
+  ) where
 
 import Yesod.Paginator.Prelude
 
@@ -49,19 +49,19 @@ type PaginationWidget site a = Pages a -> WidgetFor site ()
 --     \<li .next>\<a href=\"?p=9\">9
 --     \<li .next>\<a href=\"?p=8\">»
 -- @
---
 simple :: Natural -> PaginationWidget m a
 simple = simpleWith defaultPaginationConfig
 
 simpleWith :: PaginationConfig -> Natural -> PaginationWidget m a
 simpleWith config elements pages = do
-    updateGetParams <- getUpdateGetParams (paginationConfigPageParamName config)
+  updateGetParams <- getUpdateGetParams (paginationConfigPageParamName config)
 
-    let (prevPages, nextPages) = getBalancedPages elements pages
-        mPrevPage = getPreviousPage pages
-        mNextPage = getNextPage pages
+  let
+    (prevPages, nextPages) = getBalancedPages elements pages
+    mPrevPage = getPreviousPage pages
+    mNextPage = getNextPage pages
 
-    [whamlet|$newline never
+  [whamlet|$newline never
         <ul .pagination>
             $maybe prevPage <- mPrevPage
                 <li .prev>
@@ -92,30 +92,31 @@ ellipsed = ellipsedWith defaultPaginationConfig
 
 ellipsedWith :: PaginationConfig -> Natural -> PaginationWidget m a
 ellipsedWith config elements pages = do
-    updateGetParams <- getUpdateGetParams (paginationConfigPageParamName config)
+  updateGetParams <- getUpdateGetParams (paginationConfigPageParamName config)
 
-    let (prevPages, nextPages) = getBalancedPages elements pages
+  let
+    (prevPages, nextPages) = getBalancedPages elements pages
 
-        mPrevPage = getPreviousPage pages
-        mNextPage = getNextPage pages
+    mPrevPage = getPreviousPage pages
+    mNextPage = getNextPage pages
 
-        (mFirstPage, firstEllipses)
-            | pageNumber (pagesCurrent pages) == 1 = (Nothing, False)
-            | headMay prevPages == Just 1 = (Nothing, False)
-            | headMay prevPages == Just 2 = (Just (1 :: PageNumber), False)
-            | otherwise = (Just 1, True)
+    (mFirstPage, firstEllipses)
+      | pageNumber (pagesCurrent pages) == 1 = (Nothing, False)
+      | headMay prevPages == Just 1 = (Nothing, False)
+      | headMay prevPages == Just 2 = (Just (1 :: PageNumber), False)
+      | otherwise = (Just 1, True)
 
-        (mLastPage, lastEllipses)
-            | pageNumber (pagesCurrent pages) == pagesLast pages
-            = (Nothing, False)
-            | lastMay nextPages == Just (pagesLast pages)
-            = (Nothing, False)
-            | lastMay nextPages == Just (pagesLast pages - 1)
-            = (Just $ pagesLast pages, False)
-            | otherwise
-            = (Just $ pagesLast pages, True)
+    (mLastPage, lastEllipses)
+      | pageNumber (pagesCurrent pages) == pagesLast pages =
+          (Nothing, False)
+      | lastMay nextPages == Just (pagesLast pages) =
+          (Nothing, False)
+      | lastMay nextPages == Just (pagesLast pages - 1) =
+          (Just $ pagesLast pages, False)
+      | otherwise =
+          (Just $ pagesLast pages, True)
 
-    [whamlet|$newline never
+  [whamlet|$newline never
         <ul .pagination>
             $maybe prevPage <- mPrevPage
                 <li .prev>
@@ -163,32 +164,32 @@ ellipsedWith config elements pages = do
 --
 -- >>> getBalancedPages 6 $ page 10
 -- ([5,6,7,8,9],[])
---
 getBalancedPages :: Natural -> Pages a -> ([PageNumber], [PageNumber])
 getBalancedPages elements pages =
-    if genericLength nextPages >= (elements `div` 2)
-        then (prevPagesNaive, nextPages)
-        else (prevPagesCalcd, nextPages)
-  where
-    nextPages =
-        takeNextPages (elements - genericLength prevPagesNaive - 1) pages
-    prevPagesNaive = takePreviousPages (elements `div` 2) pages
-    prevPagesCalcd =
-        takePreviousPages (elements - genericLength nextPages - 1) pages
+  if genericLength nextPages >= (elements `div` 2)
+    then (prevPagesNaive, nextPages)
+    else (prevPagesCalcd, nextPages)
+ where
+  nextPages =
+    takeNextPages (elements - genericLength prevPagesNaive - 1) pages
+  prevPagesNaive = takePreviousPages (elements `div` 2) pages
+  prevPagesCalcd =
+    takePreviousPages (elements - genericLength nextPages - 1) pages
 
 getUpdateGetParams
-    :: PageParamName -> WidgetFor site (PageNumber -> [(Text, Text)])
+  :: PageParamName -> WidgetFor site (PageNumber -> [(Text, Text)])
 getUpdateGetParams pageParamName = do
-    params <- handlerToWidget $ reqGetParams <$> getRequest
-    pure $ \number -> setPageParameters pageParamName number params
+  params <- handlerToWidget $ reqGetParams <$> getRequest
+  pure $ \number -> setPageParameters pageParamName number params
 
 renderGetParams :: [(Text, Text)] -> Text
 renderGetParams [] = ""
 renderGetParams ps = "?" <> T.intercalate "&" (map renderGetParam ps)
-    where renderGetParam (k, v) = encodeText k <> "=" <> encodeText v
+ where
+  renderGetParam (k, v) = encodeText k <> "=" <> encodeText v
 
 setPageParameters
-    :: Show a => PageParamName -> a -> [(Text, Text)] -> [(Text, Text)]
+  :: Show a => PageParamName -> a -> [(Text, Text)] -> [(Text, Text)]
 setPageParameters pageParamName number params =
-    let name = unPageParamName pageParamName
-    in [(name, tshow number)] <> filter ((/=) name . fst) params
+  let name = unPageParamName pageParamName
+  in  [(name, tshow number)] <> filter ((/=) name . fst) params
