@@ -1,0 +1,6 @@
+# This file is a list of commits to be ignored in commands such as git-blame. To
+# make this work, you need to run:
+#
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+###
