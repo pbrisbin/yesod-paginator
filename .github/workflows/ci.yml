@@ -23,13 +23,15 @@ jobs:
           - stack-lts-12.26.yaml # ghc-8.4
       fail-fast: false
 
+    env:
+      STACK_YAML: ${{ matrix.stack-yaml }}
+
     steps:
       - uses: actions/checkout@v4
 
       - id: stack
         uses: freckle/stack-action@v5
         with:
-          stack-yaml: ${{ matrix.stack-yaml }}
           stack-arguments: --coverage
           compiler-tools: hpc-lcov
 
