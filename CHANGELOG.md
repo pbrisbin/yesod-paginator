@@ -1,6 +1,8 @@
-## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.2...main)
+## [*Unreleased*](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.3...main)
 
-None
+## [v1.1.2.3](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.3...v1.1.2.3)
+
+- Add CI builds for GHC 9.x
 
 ## [v1.1.2.2](https://github.com/pbrisbin/yesod-paginator/compare/v1.1.2.1...v1.1.2.2)
 
