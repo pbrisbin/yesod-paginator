@@ -1,8 +1,4 @@
-resolver: lts-19.1
-
-extra-deps:
-  # For weeder
-  - algebraic-graphs-0.5
+resolver: lts-22.23
 
 flags:
   yesod-paginator:
