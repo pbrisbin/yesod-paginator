@@ -45,11 +45,6 @@ jobs:
         with:
           files: ./lcov.info
 
-      - if: ${{ matrix.stack-yaml == 'stack.yaml' }}
-        uses: freckle/weeder-action@v2
-        with:
-          ghc-version: ${{ steps.stack.outputs.compiler-version }}
-
   hlint:
     runs-on: ubuntu-latest
     steps:
